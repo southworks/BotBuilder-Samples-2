@@ -22,8 +22,8 @@ const {
 } = require('botbuilder');
 
 // This bot's main dialog.
-const { RichCardsBot } = require('./bots/richCardsBot');
-const { MainDialog } = require('./dialogs/mainDialog');
+const { RichCardsBot } = require('./bots/richCardsBot')
+const { MainDialog } = require('./dialogs/mainDialog')
 
 const credentialsFactory = new ConfigurationServiceClientCredentialFactory({
     MicrosoftAppId: process.env.MicrosoftAppId,
