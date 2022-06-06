@@ -86,3 +86,4 @@ server.on('upgrade', async (req, socket, head) => {
 
     await streamingAdapter.process(req, socket as unknown as INodeSocket, head, (context) => myBot.run(context));
 });
+ 
