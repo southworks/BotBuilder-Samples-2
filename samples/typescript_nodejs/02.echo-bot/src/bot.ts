@@ -20,7 +20,7 @@ export class EchoBot extends ActivityHandler {
             for (const member of membersAdded) {
                 if (member.id !== context.activity.recipient.id) {
                     await context.sendActivity(MessageFactory.text(welcomeText, welcomeText));
-                }
+                 }
             }
             // By calling next() you ensure that the next BotHandler is run.
             await next();
