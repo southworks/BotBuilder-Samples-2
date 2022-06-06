@@ -94,8 +94,7 @@ jobs:
 
       - name: yarn lint
         run: |
-          if [${{ endsWith(matrix.files[0], '.js') }}]
-          then
+          if ${{ endsWith(matrix.files[0], '.js') }}; then
             yarn eslint ${{ join(matrix.files, ' ') }}
           else
             yarn tslint ${{ join(matrix.files, ' ') }}
