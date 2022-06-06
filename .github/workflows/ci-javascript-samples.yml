@@ -1,4 +1,4 @@
-name: js-build
+name: ci-javascript-samples
 
 env:
   ROOT_FOLDER: BotBuilder-Samples/samples/
