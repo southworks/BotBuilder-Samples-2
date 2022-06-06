@@ -22,7 +22,7 @@ const {
 const { EchoBot } = require('./bot');
 
 // Create HTTP server
-const server = restify.createServer();
+const server = restify.createServer()
 server.use(restify.plugins.bodyParser());
 
 server.listen(process.env.port || process.env.PORT || 3978, () => {

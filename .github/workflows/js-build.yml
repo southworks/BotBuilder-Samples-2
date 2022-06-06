@@ -93,5 +93,11 @@ jobs:
         working-directory: ${{ matrix.folder }}
 
       - name: yarn lint
-        run: yarn ("${{ contains(matrix.files, '.js') }}" -eq "true" && eslint || tslint) ${{ join(matrix.files, ' ') }}
+        run: |
+          if [ "${{ contains(matrix.files, '.js') }}" -eq "true" ]
+          then
+            yarn eslint ${{ join(matrix.files, ' ') }}
+          else
+            yarn tslint ${{ join(matrix.files, ' ') }}
+          fi
         working-directory: ${{ matrix.folder }}
