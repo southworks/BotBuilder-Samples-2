@@ -94,7 +94,7 @@ jobs:
 
       - name: yarn lint
         run: |
-          if [ "${{ contains(matrix.files, '.js') }}" -eq "true" ]
+          if [ "${{ endsWith(matrix.files[0], '.js') }}" -eq "true" ]
           then
             yarn eslint ${{ join(matrix.files, ' ') }}
           else
