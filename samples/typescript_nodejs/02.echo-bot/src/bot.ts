@@ -28,4 +28,4 @@ export class EchoBot extends ActivityHandler {
     }
 }
 
-console.log('test');
+console.log('test')
