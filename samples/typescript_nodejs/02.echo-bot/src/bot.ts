@@ -27,3 +27,5 @@ export class EchoBot extends ActivityHandler {
         });
     }
 }
+
+console.log('test');
