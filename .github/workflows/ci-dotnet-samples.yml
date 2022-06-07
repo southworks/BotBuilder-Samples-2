@@ -48,13 +48,9 @@ jobs:
 
           $result = $paths | ForEach-Object { UpSearchFolder -path $_ -file $pkg } | Get-Unique | ForEach-Object {
             $folder = $_
-            $json = Get-Content -Raw -Path (Join-Path $folder $pkg) | ConvertFrom-Json
-            $files = @($paths | Where-Object { $_.StartsWith($folder) })
             return @{ 
               name = $folder.Substring($folder.IndexOf($rootFolder) + $rootFolder.Length);
-              scripts = @($json.scripts | Get-Member -MemberType NoteProperty | Select-Object -ExpandProperty Name);
               folder = $folder;
-              files = $files
             } 
           }
 
