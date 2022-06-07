@@ -48,9 +48,11 @@ jobs:
 
           $result = $paths | ForEach-Object { UpSearchFolder -path $_ -file $pkg } | Get-Unique | ForEach-Object {
             $folder = $_
+            $files = @($paths | Where-Object { $_.StartsWith($folder) })
             return @{ 
               name = $folder.Substring($folder.IndexOf($rootFolder) + $rootFolder.Length);
               folder = $folder;
+              files = $files;
             } 
           }
 
@@ -79,8 +81,8 @@ jobs:
         with:
           dotnet-version: "6.0.x"
 
-      - name: Run dotnet format
-        uses: xt0rted/dotnet-format@v1
-        with:
-          fail-fast: "false"
-          # only-changed-files: "true"
+      - name: dotnet format
+        run: dotnet tool install -g dotnet-format
+
+      - name: dotnet format
+        run: dotnet-format --include "${{ join(matrix.files, ' ') }}"
