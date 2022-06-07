@@ -22,7 +22,7 @@ namespace Microsoft.BotBuilderSamples.Bots
             var welcomeText = "Hello and welcome!";
             foreach (var member in membersAdded)
             {
-                if (member.Id != turnContext.Activity.Recipient.Id)
+                  if (member.Id != turnContext.Activity.Recipient.Id)
                 {
                     await turnContext.SendActivityAsync(MessageFactory.Text(welcomeText, welcomeText), cancellationToken);
                 }
