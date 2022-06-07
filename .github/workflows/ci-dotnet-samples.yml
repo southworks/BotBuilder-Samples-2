@@ -84,7 +84,6 @@ jobs:
 
       - name: Run dotnet format
         uses: xt0rted/dotnet-format@v1
-        working-directory: ${{ matrix.folder }}
         with:
           only-changed-files: "true"
           fail-fast: "false"
