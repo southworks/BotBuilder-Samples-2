@@ -49,10 +49,12 @@ jobs:
           $result = $paths | ForEach-Object { UpSearchFolder -path $_ -file $pkg } | Get-Unique | ForEach-Object {
             $folder = $_
             $files = @($paths | Where-Object { $_.StartsWith($folder) })
+            $csproj = Get-ChildItem -Path $folder -Filter *.csproj | Select-Object -ExpandProperty FullName -First 1
             return @{ 
               name = $folder.Substring($folder.IndexOf($rootFolder) + $rootFolder.Length);
               folder = $folder;
               files = $files;
+              project = $csproj;
             } 
           }
 
@@ -74,7 +76,7 @@ jobs:
     name: bot - ${{ matrix.name }}
     steps:
       - uses: actions/checkout@v3
-      - uses: xt0rted/dotnet-format-problem-matcher@v1
+      # - uses: xt0rted/dotnet-format-problem-matcher@v1
 
       - name: use .net 6.0.x
         uses: actions/setup-dotnet@v1
@@ -85,5 +87,5 @@ jobs:
         run: dotnet tool install -g dotnet-format
 
       - name: dotnet format
-        run: dotnet-format --include "${{ join(matrix.files, ' ') }}"
+        run: dotnet-format ${{ matrix.project }} --include "${{ join(matrix.files, ' ') }}"
         working-directory: ${{ matrix.folder }}
