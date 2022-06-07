@@ -91,6 +91,7 @@ jobs:
         run: dotnet tool install -g dotnet-format
 
       - name: dotnet format
-        run: dotnet-format analyzers ${{ matrix.project }} --include "${{ join(matrix.files, ' ') }}" --verify-no-changes
-        run: dotnet-format style ${{ matrix.project }} --include "${{ join(matrix.files, ' ') }}" --verify-no-changes
+        run: | 
+          dotnet-format analyzers ${{ matrix.project }} --include "${{ join(matrix.files, ' ') }}" --verify-no-changes
+          dotnet-format style ${{ matrix.project }} --include "${{ join(matrix.files, ' ') }}" --verify-no-changes
         # working-directory: ${{ matrix.folder }}
