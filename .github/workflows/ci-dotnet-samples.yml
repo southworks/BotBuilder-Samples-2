@@ -83,9 +83,13 @@ jobs:
         with:
           dotnet-version: "6.0.x"
 
-      - name: dotnet format
-        run: dotnet tool install -g dotnet-format
+      - name: dotnet build
+        run: dotnet build --configuration Release
+        working-directory: ${{ matrix.folder }}
 
-      - name: dotnet format
-        run: dotnet-format ${{ matrix.project }} --include "${{ join(matrix.files, ' ') }}" --verify-no-changes
-        # working-directory: ${{ matrix.folder }}
+      # - name: dotnet format
+      #   run: dotnet tool install -g dotnet-format
+
+      # - name: dotnet format
+      #   run: dotnet-format ${{ matrix.project }} --include "${{ join(matrix.files, ' ') }}" --verify-no-changes
+      #   # working-directory: ${{ matrix.folder }}
