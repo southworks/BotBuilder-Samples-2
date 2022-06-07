@@ -82,5 +82,5 @@ jobs:
       - name: Run dotnet format
         uses: xt0rted/dotnet-format@v1
         with:
-          only-changed-files: "true"
           fail-fast: "false"
+          # only-changed-files: "true"
