@@ -83,5 +83,5 @@ jobs:
         working-directory: ${{ matrix.folder }}
 
       - name: dotnet build
-        run: dotnet build --configuration Release --no-restore
+        run: dotnet build --configuration Release --no-restore --nologo --clp:NoSummary
         working-directory: ${{ matrix.folder }}
