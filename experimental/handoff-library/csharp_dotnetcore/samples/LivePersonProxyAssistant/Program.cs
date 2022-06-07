@@ -10,6 +10,7 @@ namespace LivePersonProxyAssistant
     {
         public static void Main(string[] args)
         {
+            var asd = "Hello and welcome!";
             CreateHostBuilder(args).Build().Run();
         }
 
