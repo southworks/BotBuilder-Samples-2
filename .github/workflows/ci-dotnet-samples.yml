@@ -86,3 +86,4 @@ jobs:
 
       - name: dotnet format
         run: dotnet-format --include "${{ join(matrix.files, ' ') }}"
+        working-directory: ${{ matrix.folder }}
