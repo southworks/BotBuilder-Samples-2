@@ -98,7 +98,4 @@ jobs:
         run: dotnet tool install csharpier -g
 
       - name: dotnet format
-        run: |
-          dotnet tool restore
-          dotnet csharpier --check
-        working-directory: ${{ matrix.folder }}
+        run: dotnet csharpier --check ${{ matrix.folder }}
