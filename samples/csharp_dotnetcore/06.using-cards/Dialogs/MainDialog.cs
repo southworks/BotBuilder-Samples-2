@@ -1,5 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
+#pragma warning disable CA1051 //Do not declare visible instance fields
 
 using System.Collections.Generic;
 using System.Threading;
@@ -49,7 +50,7 @@ namespace Microsoft.BotBuilderSamples
             };
 
             // Prompt the user with the configured PromptOptions.
-            return await stepContext.PromptAsync(nameof(ChoicePrompt), options, cancellationToken);
+            return await stepContext.PromptAsync(nameof(ChoicePrompt), options, cancellationToken).ConfigureAwait(false);
         }
 
         // Send a Rich Card response to the user based on their choice.
@@ -120,12 +121,12 @@ namespace Microsoft.BotBuilderSamples
             }
 
             // Send the card(s) to the user as an attachment to the activity
-            await stepContext.Context.SendActivityAsync(reply, cancellationToken);
+            await stepContext.Context.SendActivityAsync(reply, cancellationToken).ConfigureAwait(false);
 
             // Give the user instructions about what to do next
-            await stepContext.Context.SendActivityAsync(MessageFactory.Text("Type anything to see another card."), cancellationToken);
+            await stepContext.Context.SendActivityAsync(MessageFactory.Text("Type anything to see another card."), cancellationToken).ConfigureAwait(false);
 
-            return await stepContext.EndDialogAsync();
+            return await stepContext.EndDialogAsync().ConfigureAwait(false);
         }
 
         private IList<Choice> GetChoices()

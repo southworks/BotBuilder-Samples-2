@@ -31,7 +31,7 @@ namespace Microsoft.BotBuilderSamples
                         + " This bot will show you different types of Rich Cards."
                         + " Please type anything to get started.");
 
-                    await turnContext.SendActivityAsync(reply, cancellationToken);
+                    await turnContext.SendActivityAsync(reply, cancellationToken).ConfigureAwait(false);
                 }
             }
         }
