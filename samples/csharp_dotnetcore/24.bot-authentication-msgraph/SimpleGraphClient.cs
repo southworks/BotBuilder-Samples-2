@@ -28,7 +28,7 @@ namespace Microsoft.BotBuilderSamples
         public async Task<User> GetMeAsync()
         {
             var graphClient = GetAuthenticatedClient();
-            var me = await graphClient.Me.Request().GetAsync();
+            var me = await graphClient.Me.Request().GetAsync().ConfigureAwait(false);
             return me;
         }
 
