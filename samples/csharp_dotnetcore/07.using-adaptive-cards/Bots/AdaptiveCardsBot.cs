@@ -40,7 +40,7 @@ namespace Microsoft.BotBuilderSamples
 
         protected override async Task OnMembersAddedAsync(IList<ChannelAccount> membersAdded, ITurnContext<IConversationUpdateActivity> turnContext, CancellationToken cancellationToken)
         {
-            await SendWelcomeMessageAsync(turnContext, cancellationToken);
+            await SendWelcomeMessageAsync(turnContext, cancellationToken).ConfigureAwait(false);
         }
 
         protected override async Task OnMessageActivityAsync(ITurnContext<IMessageActivity> turnContext, CancellationToken cancellationToken)
@@ -49,8 +49,8 @@ namespace Microsoft.BotBuilderSamples
             var cardAttachment = CreateAdaptiveCardAttachment(_cards[r.Next(_cards.Length)]);
 
             //turnContext.Activity.Attachments = new List<Attachment>() { cardAttachment };
-            await turnContext.SendActivityAsync(MessageFactory.Attachment(cardAttachment), cancellationToken);
-            await turnContext.SendActivityAsync(MessageFactory.Text("Please enter any text to see another card."), cancellationToken);
+            await turnContext.SendActivityAsync(MessageFactory.Attachment(cardAttachment), cancellationToken).ConfigureAwait(false);
+            await turnContext.SendActivityAsync(MessageFactory.Text("Please enter any text to see another card."), cancellationToken).ConfigureAwait(false);
         }
 
         private static async Task SendWelcomeMessageAsync(ITurnContext turnContext, CancellationToken cancellationToken)
@@ -61,7 +61,7 @@ namespace Microsoft.BotBuilderSamples
                 {
                     await turnContext.SendActivityAsync(
                         $"Welcome to Adaptive Cards Bot {member.Name}. {WelcomeText}",
-                        cancellationToken: cancellationToken);
+                        cancellationToken: cancellationToken).ConfigureAwait(false);
                 }
             }
         }
