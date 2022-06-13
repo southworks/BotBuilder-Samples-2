@@ -24,7 +24,7 @@ namespace Microsoft.BotBuilderSamples
             {
                 if (member.Id != turnContext.Activity.Recipient.Id)
                 {
-                    await turnContext.SendActivityAsync(MessageFactory.Text("Welcome to AuthenticationBot. Type anything to get logged in. Type 'logout' to sign-out."), cancellationToken);
+                    await turnContext.SendActivityAsync(MessageFactory.Text("Welcome to AuthenticationBot. Type anything to get logged in. Type 'logout' to sign-out."), cancellationToken).ConfigureAwait(false);
                 }
             }
         }
@@ -34,7 +34,7 @@ namespace Microsoft.BotBuilderSamples
             Logger.LogInformation("Running dialog with Token Response Event Activity.");
 
             // Run the Dialog with the new Token Response Event Activity.
-            await Dialog.RunAsync(turnContext, ConversationState.CreateProperty<DialogState>(nameof(DialogState)), cancellationToken);
+            await Dialog.RunAsync(turnContext, ConversationState.CreateProperty<DialogState>(nameof(DialogState)), cancellationToken).ConfigureAwait(false);
         }
     }
 }
