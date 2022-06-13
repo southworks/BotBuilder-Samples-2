@@ -18,15 +18,15 @@ namespace Microsoft.BotBuilderSamples
         // Send the user their Graph Display Name from the bot.
         public static async Task ListMeAsync(ITurnContext turnContext, TokenResponse tokenResponse)
         {
-            var user = await GetUserAsync(turnContext, tokenResponse);
-            await turnContext.SendActivityAsync($"You are {user.DisplayName}.");
+            var user = await GetUserAsync(turnContext, tokenResponse).ConfigureAwait(false);
+            await turnContext.SendActivityAsync($"You are {user.DisplayName}.").ConfigureAwait(false);
         }
 
         // Send the user their Graph Email Address from the bot.
         public static async Task ListEmailAddressAsync(ITurnContext turnContext, TokenResponse tokenResponse)
         {
-            var user = await GetUserAsync(turnContext, tokenResponse);
-            await turnContext.SendActivityAsync($"Your email: {user.Mail}.");
+            var user = await GetUserAsync(turnContext, tokenResponse).ConfigureAwait(false);
+            await turnContext.SendActivityAsync($"Your email: {user.Mail}.").ConfigureAwait(false);
         }
 
         private static async Task<User> GetUserAsync(ITurnContext turnContext, TokenResponse tokenResponse)
@@ -43,7 +43,7 @@ namespace Microsoft.BotBuilderSamples
 
             // Pull in the data from the Microsoft Graph.
             var client = new SimpleGraphClient(tokenResponse.Token);
-            return await client.GetMeAsync();
+            return await client.GetMeAsync().ConfigureAwait(false);
         }
     }
 }

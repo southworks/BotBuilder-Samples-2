@@ -1,5 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
+#pragma warning disable CA1051 //Do not declare visible instance fields
 
 using System.Threading;
 using System.Threading.Tasks;
@@ -47,7 +48,7 @@ namespace Microsoft.BotBuilderSamples
 
         private async Task<DialogTurnResult> PromptStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
-            return await stepContext.BeginDialogAsync(nameof(OAuthPrompt), null, cancellationToken);
+            return await stepContext.BeginDialogAsync(nameof(OAuthPrompt), null, cancellationToken).ConfigureAwait(false);
         }
 
         private async Task<DialogTurnResult> LoginStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
@@ -57,12 +58,12 @@ namespace Microsoft.BotBuilderSamples
             var tokenResponse = (TokenResponse)stepContext.Result;
             if (tokenResponse != null)
             {
-                await stepContext.Context.SendActivityAsync(MessageFactory.Text("You are now logged in."), cancellationToken);
-                return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = MessageFactory.Text("Would you like to do? (type 'me', or 'email')") }, cancellationToken);
+                await stepContext.Context.SendActivityAsync(MessageFactory.Text("You are now logged in."), cancellationToken).ConfigureAwait(false);
+                return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = MessageFactory.Text("Would you like to do? (type 'me', or 'email')") }, cancellationToken).ConfigureAwait(false);
             }
 
-            await stepContext.Context.SendActivityAsync(MessageFactory.Text("Login was not successful please try again."), cancellationToken);
-            return await stepContext.EndDialogAsync();
+            await stepContext.Context.SendActivityAsync(MessageFactory.Text("Login was not successful please try again."), cancellationToken).ConfigureAwait(false);
+            return await stepContext.EndDialogAsync().ConfigureAwait(false);
         }
 
         private async Task<DialogTurnResult> CommandStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
@@ -77,7 +78,7 @@ namespace Microsoft.BotBuilderSamples
             //
             // There is no reason to store the token locally in the bot because we can always just call
             // the OAuth prompt to get the token or get a new token if needed.
-            return await stepContext.BeginDialogAsync(nameof(OAuthPrompt), null, cancellationToken);
+            return await stepContext.BeginDialogAsync(nameof(OAuthPrompt), null, cancellationToken).ConfigureAwait(false);
         }
 
         private async Task<DialogTurnResult> ProcessStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
@@ -96,24 +97,24 @@ namespace Microsoft.BotBuilderSamples
 
                     if (command == "me")
                     {
-                        await OAuthHelpers.ListMeAsync(stepContext.Context, tokenResponse);
+                        await OAuthHelpers.ListMeAsync(stepContext.Context, tokenResponse).ConfigureAwait(false);
                     }
                     else if (command.StartsWith("email"))
                     {
-                        await OAuthHelpers.ListEmailAddressAsync(stepContext.Context, tokenResponse);
+                        await OAuthHelpers.ListEmailAddressAsync(stepContext.Context, tokenResponse).ConfigureAwait(false);
                     }
                     else
                     {
-                        await stepContext.Context.SendActivityAsync(MessageFactory.Text($"Your token is: {tokenResponse.Token}"), cancellationToken);
+                        await stepContext.Context.SendActivityAsync(MessageFactory.Text($"Your token is: {tokenResponse.Token}"), cancellationToken).ConfigureAwait(false);
                     }
                 }
             }
             else
             {
-                await stepContext.Context.SendActivityAsync(MessageFactory.Text("We couldn't log you in. Please try again later."), cancellationToken);
+                await stepContext.Context.SendActivityAsync(MessageFactory.Text("We couldn't log you in. Please try again later."), cancellationToken).ConfigureAwait(false);
             }
 
-            return await stepContext.EndDialogAsync(cancellationToken: cancellationToken);
+            return await stepContext.EndDialogAsync(cancellationToken: cancellationToken).ConfigureAwait(false);
         }
     }
 }
