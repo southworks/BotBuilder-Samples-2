@@ -35,10 +35,10 @@ namespace Microsoft.BotBuilderSamples
         {
             // A custom adapter and corresponding TurnContext that buffers any messages sent.
             var adapter = new DialogHostAdapter();
-            var turnContext = new TurnContext(adapter, (Activity)activity);
+            using var turnContext = new TurnContext(adapter, (Activity)activity);
 
             // Run the dialog using this TurnContext with the existing state.
-            var newState = await RunTurnAsync(dialog, turnContext, oldState, cancellationToken);
+            var newState = await RunTurnAsync(dialog, turnContext, oldState, cancellationToken).ConfigureAwait(false);
 
             // The result is a set of activities to send and a replacement state.
             return (adapter.Activities.ToArray(), newState);
@@ -64,7 +64,7 @@ namespace Microsoft.BotBuilderSamples
             var accessor = new RefAccessor<DialogState>(dialogState);
 
             // Run the dialog.
-            await dialog.RunAsync(turnContext, accessor, cancellationToken);
+            await dialog.RunAsync(turnContext, accessor, cancellationToken).ConfigureAwait(false);
 
             // Serialize the result (available as Value on the accessor), and put its value back into a new JObject.
             return new JObject { { nameof(DialogState), JObject.FromObject(accessor.Value, StateJsonSerializer) } };

@@ -23,17 +23,17 @@ namespace Microsoft.BotBuilderSamples
         {
             if (string.IsNullOrWhiteSpace(accountName))
             {
-                throw new ArgumentException(nameof(accountName));
+                throw new ArgumentException(null, nameof(accountName));
             }
 
             if (string.IsNullOrWhiteSpace(accountKey))
             {
-                throw new ArgumentException(nameof(accountKey));
+                throw new ArgumentException(null, nameof(accountKey));
             }
 
             if (string.IsNullOrWhiteSpace(containerName))
             {
-                throw new ArgumentException(nameof(containerName));
+                throw new ArgumentException(null, nameof(containerName));
             }
 
             var storageCredentials = new StorageCredentials(accountName, accountKey);
@@ -46,13 +46,13 @@ namespace Microsoft.BotBuilderSamples
         {
             if (string.IsNullOrWhiteSpace(key))
             {
-                throw new ArgumentException(nameof(key));
+                throw new ArgumentException(null, nameof(key));
             }
 
             var blob = _container.GetBlockBlobReference(key);
             try
             {
-                var content = await blob.DownloadTextAsync();
+                var content = await blob.DownloadTextAsync().ConfigureAwait(false);
                 var obj = JObject.Parse(content);
                 var etag = blob.Properties.ETag;
                 return (obj, etag);
@@ -68,7 +68,7 @@ namespace Microsoft.BotBuilderSamples
         {
             if (string.IsNullOrWhiteSpace(key))
             {
-                throw new ArgumentException(nameof(key));
+                throw new ArgumentException(null, nameof(key));
             }
 
             if (obj == null)
@@ -83,7 +83,7 @@ namespace Microsoft.BotBuilderSamples
             {
                 try
                 {
-                    await blob.UploadTextAsync(content, Encoding.UTF8, new AccessCondition { IfMatchETag = etag }, new BlobRequestOptions(), new OperationContext());
+                    await blob.UploadTextAsync(content, Encoding.UTF8, new AccessCondition { IfMatchETag = etag }, new BlobRequestOptions(), new OperationContext()).ConfigureAwait(false);
                 }
                 catch (StorageException e)
                     when (e.RequestInformation.HttpStatusCode == (int)HttpStatusCode.PreconditionFailed)
@@ -93,7 +93,7 @@ namespace Microsoft.BotBuilderSamples
             }
             else
             {
-                await blob.UploadTextAsync(content);
+                await blob.UploadTextAsync(content).ConfigureAwait(false);
             }
 
             return true;

@@ -12,7 +12,7 @@ namespace Microsoft.BotBuilderSamples
     /// <summary>
     /// A thread safe implementation of the IStore abstraction intended for testing.
     /// </summary>
-    public class MemoryStore : IStore
+    public class MemoryStore : IStore, IDisposable
     {
         private IDictionary<string, (JObject, string)> _store = new Dictionary<string, (JObject, string)>();
         private SemaphoreSlim _semaphoreSlim = new SemaphoreSlim(1, 1);
@@ -21,7 +21,7 @@ namespace Microsoft.BotBuilderSamples
         {
             try
             {
-                await _semaphoreSlim.WaitAsync();
+                await _semaphoreSlim.WaitAsync().ConfigureAwait(false);
 
                 if (_store.TryGetValue(key, out ValueTuple<JObject, string> value))
                 {
@@ -40,7 +40,7 @@ namespace Microsoft.BotBuilderSamples
         {
             try
             {
-                await _semaphoreSlim.WaitAsync();
+                await _semaphoreSlim.WaitAsync().ConfigureAwait(false);
 
                 if (eTag != null && _store.TryGetValue(key, out ValueTuple<JObject, string> value))
                 {
@@ -57,6 +57,22 @@ namespace Microsoft.BotBuilderSamples
             {
                 _semaphoreSlim.Release();
             }
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                // Dispose managed resources.
+                _semaphoreSlim.Dispose();
+            }
+            // Free native resources.
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
     }
 }

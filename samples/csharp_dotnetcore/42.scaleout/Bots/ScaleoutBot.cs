@@ -49,13 +49,13 @@ namespace Microsoft.BotBuilderSamples
             while (true)
             {
                 // Load any existing state associated with this key
-                var (oldState, etag) = await _store.LoadAsync(key);
+                var (oldState, etag) = await _store.LoadAsync(key).ConfigureAwait(false);
 
                 // Run the dialog system with the old state and inbound activity, the result is a new state and outbound activities.
-                var (activities, newState) = await DialogHost.RunAsync(_dialog, turnContext.Activity, oldState, cancellationToken);
+                var (activities, newState) = await DialogHost.RunAsync(_dialog, turnContext.Activity, oldState, cancellationToken).ConfigureAwait(false);
 
                 // Save the updated state associated with this key.
-                var success = await _store.SaveAsync(key, newState, etag);
+                var success = await _store.SaveAsync(key, newState, etag).ConfigureAwait(false);
 
                 // Following a successful save, send any outbound Activities, otherwise retry everything.
                 if (success)
@@ -63,7 +63,7 @@ namespace Microsoft.BotBuilderSamples
                     if (activities.Any())
                     {
                         // This is an actual send on the TurnContext we were given and so will actual do a send this time.
-                        await turnContext.SendActivitiesAsync(activities, cancellationToken);
+                        await turnContext.SendActivitiesAsync(activities, cancellationToken).ConfigureAwait(false);
                     }
 
                     break;

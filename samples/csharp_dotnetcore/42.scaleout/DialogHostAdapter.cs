@@ -29,7 +29,7 @@ namespace Microsoft.BotBuilderSamples
                 _response.Add(activity);
             }
 
-            return Task.FromResult(new ResourceResponse[0]);
+            return Task.FromResult(Array.Empty<ResourceResponse>());
         }
 
         #region Not Implemented
