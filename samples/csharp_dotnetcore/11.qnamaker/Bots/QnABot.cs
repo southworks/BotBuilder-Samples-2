@@ -27,7 +27,7 @@ namespace Microsoft.BotBuilderSamples
 
         protected override async Task OnMessageActivityAsync(ITurnContext<IMessageActivity> turnContext, CancellationToken cancellationToken)
         {
-            var httpClient = _httpClientFactory.CreateClient();
+            using var httpClient = _httpClientFactory.CreateClient();
 
             var qnaMaker = new QnAMaker(new QnAMakerEndpoint
             {
@@ -43,14 +43,14 @@ namespace Microsoft.BotBuilderSamples
             var options = new QnAMakerOptions { Top = 1 };
 
             // The actual call to the QnA Maker service.
-            var response = await qnaMaker.GetAnswersAsync(turnContext, options);
+            var response = await qnaMaker.GetAnswersAsync(turnContext, options).ConfigureAwait(false);
             if (response != null && response.Length > 0)
             {
-                await turnContext.SendActivityAsync(MessageFactory.Text(response[0].Answer), cancellationToken);
+                await turnContext.SendActivityAsync(MessageFactory.Text(response[0].Answer), cancellationToken).ConfigureAwait(false);
             }
             else
             {
-                await turnContext.SendActivityAsync(MessageFactory.Text("No QnA Maker answers were found."), cancellationToken);
+                await turnContext.SendActivityAsync(MessageFactory.Text("No QnA Maker answers were found."), cancellationToken).ConfigureAwait(false);
             }
         }
     }
