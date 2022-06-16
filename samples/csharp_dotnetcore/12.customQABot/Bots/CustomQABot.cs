@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -35,19 +36,19 @@ namespace Microsoft.BotBuilderSamples.Bots
             _hostname = configuration["LanguageEndpointHostName"];
             if (string.IsNullOrEmpty(_hostname))
             {
-                throw new ArgumentException(string.Format(missingConfigError, "LanguageEndpointHostName"));
+                throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, missingConfigError, "LanguageEndpointHostName"));
             }
 
             _endpointKey = configuration["LanguageEndpointKey"];
             if (string.IsNullOrEmpty(_endpointKey))
             {
-                throw new ArgumentException(string.Format(missingConfigError, "LanguageEndpointKey"));
+                throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, missingConfigError, "LanguageEndpointKey"));
             }
 
             _knowledgeBaseId = configuration["ProjectName"];
             if (string.IsNullOrEmpty(_knowledgeBaseId))
             {
-                throw new ArgumentException(string.Format(missingConfigError, "ProjectName"));
+                throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, missingConfigError, "ProjectName"));
             }
 
             var welcomeMsg = configuration["DefaultWelcomeMessage"];
@@ -69,7 +70,7 @@ namespace Microsoft.BotBuilderSamples.Bots
             // Call Custom Question Answering service to get a response.
             _logger.LogInformation("Calling Custom Question Answering");
             var options = new QnAMakerOptions { Top = 1, EnablePreciseAnswer = _enablePreciseAnswer };
-            var response = await customQuestionAnswering.GetAnswersAsync(turnContext, options);
+            var response = await customQuestionAnswering.GetAnswersAsync(turnContext, options).ConfigureAwait(false);
 
             if (response.Length > 0)
             {
@@ -102,7 +103,7 @@ namespace Microsoft.BotBuilderSamples.Bots
             }
             else
             {
-                await turnContext.SendActivityAsync(MessageFactory.Text("No answers were found.", "No answers were found."), cancellationToken);
+                await turnContext.SendActivityAsync(MessageFactory.Text("No answers were found.", "No answers were found."), cancellationToken).ConfigureAwait(false);
             }
         }
 
@@ -126,7 +127,7 @@ namespace Microsoft.BotBuilderSamples.Bots
             {
                 if (member.Id != turnContext.Activity.Recipient.Id)
                 {
-                    await turnContext.SendActivityAsync(MessageFactory.Text(_defaultWelcome, _defaultWelcome), cancellationToken);
+                    await turnContext.SendActivityAsync(MessageFactory.Text(_defaultWelcome, _defaultWelcome), cancellationToken).ConfigureAwait(false);
                 }
             }
         }

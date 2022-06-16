@@ -24,8 +24,8 @@ namespace Microsoft.BotBuilderSamples
                 logger.LogError(exception, $"[OnTurnError] unhandled error : {exception.Message}");
 
                 // Send a message to the user
-                await turnContext.SendActivityAsync("The bot encountered an error or bug.");
-                await turnContext.SendActivityAsync("To continue to run this bot, please fix the bot source code.");
+                await turnContext.SendActivityAsync("The bot encountered an error or bug.").ConfigureAwait(false);
+                await turnContext.SendActivityAsync("To continue to run this bot, please fix the bot source code.").ConfigureAwait(false);
 
                 if (conversationState != null)
                 {
@@ -34,7 +34,7 @@ namespace Microsoft.BotBuilderSamples
                         // Delete the conversationState for the current conversation to prevent the
                         // bot from getting stuck in a error-loop caused by being in a bad state.
                         // ConversationState should be thought of as similar to "cookie-state" in a Web pages.
-                        await conversationState.DeleteAsync(turnContext);
+                        await conversationState.DeleteAsync(turnContext).ConfigureAwait(false);
                     }
                     catch (Exception e)
                     {
@@ -43,7 +43,7 @@ namespace Microsoft.BotBuilderSamples
                 }
 
                 // Send a trace activity, which will be displayed in the Bot Framework Emulator
-                await turnContext.TraceActivityAsync("OnTurnError Trace", exception.Message, "https://www.botframework.com/schemas/error", "TurnError");
+                await turnContext.TraceActivityAsync("OnTurnError Trace", exception.Message, "https://www.botframework.com/schemas/error", "TurnError").ConfigureAwait(false);
             };
         }
     }
