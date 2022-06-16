@@ -55,14 +55,14 @@ namespace Microsoft.BotBuilderSamples
                 {
                     Prompt = MessageFactory.Text("Please enter your mode of transport."),
                     Choices = ChoiceFactory.ToChoices(new List<string> { "Car", "Bus", "Bicycle" }),
-                }, cancellationToken);
+                }, cancellationToken).ConfigureAwait(false);
         }
 
         private static async Task<DialogTurnResult> NameStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
             stepContext.Values["transport"] = ((FoundChoice)stepContext.Result).Value;
 
-            return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = MessageFactory.Text("Please enter your name.") }, cancellationToken);
+            return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = MessageFactory.Text("Please enter your name.") }, cancellationToken).ConfigureAwait(false);
         }
 
         private async Task<DialogTurnResult> NameConfirmStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
@@ -70,10 +70,10 @@ namespace Microsoft.BotBuilderSamples
             stepContext.Values["name"] = (string)stepContext.Result;
 
             // We can send messages to the user at any point in the WaterfallStep.
-            await stepContext.Context.SendActivityAsync(MessageFactory.Text($"Thanks {stepContext.Result}."), cancellationToken);
+            await stepContext.Context.SendActivityAsync(MessageFactory.Text($"Thanks {stepContext.Result}."), cancellationToken).ConfigureAwait(false);
 
             // WaterfallStep always finishes with the end of the Waterfall or with another dialog; here it is a Prompt Dialog.
-            return await stepContext.PromptAsync(nameof(ConfirmPrompt), new PromptOptions { Prompt = MessageFactory.Text("Would you like to give your age?") }, cancellationToken);
+            return await stepContext.PromptAsync(nameof(ConfirmPrompt), new PromptOptions { Prompt = MessageFactory.Text("Would you like to give your age?") }, cancellationToken).ConfigureAwait(false);
         }
 
         private async Task<DialogTurnResult> AgeStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
@@ -88,12 +88,12 @@ namespace Microsoft.BotBuilderSamples
                     RetryPrompt = MessageFactory.Text("The value entered must be greater than 0 and less than 150."),
                 };
 
-                return await stepContext.PromptAsync(nameof(NumberPrompt<int>), promptOptions, cancellationToken);
+                return await stepContext.PromptAsync(nameof(NumberPrompt<int>), promptOptions, cancellationToken).ConfigureAwait(false);
             }
             else
             {
                 // User said "no" so we will skip the next step. Give -1 as the age.
-                return await stepContext.NextAsync(-1, cancellationToken);
+                return await stepContext.NextAsync(-1, cancellationToken).ConfigureAwait(false);
             }
         }
 
@@ -104,13 +104,13 @@ namespace Microsoft.BotBuilderSamples
             var msg = (int)stepContext.Values["age"] == -1 ? "No age given." : $"I have your age as {stepContext.Values["age"]}.";
 
             // We can send messages to the user at any point in the WaterfallStep.
-            await stepContext.Context.SendActivityAsync(MessageFactory.Text(msg), cancellationToken);
+            await stepContext.Context.SendActivityAsync(MessageFactory.Text(msg), cancellationToken).ConfigureAwait(false);
 
             if (stepContext.Context.Activity.ChannelId == Channels.Msteams)
             {
                 // This attachment prompt example is not designed to work for Teams attachments, so skip it in this case
-                await stepContext.Context.SendActivityAsync(MessageFactory.Text("Skipping attachment prompt in Teams channel..."), cancellationToken);
-                return await stepContext.NextAsync(null, cancellationToken);
+                await stepContext.Context.SendActivityAsync(MessageFactory.Text("Skipping attachment prompt in Teams channel..."), cancellationToken).ConfigureAwait(false);
+                return await stepContext.NextAsync(null, cancellationToken).ConfigureAwait(false);
             }
             else
             {
@@ -121,7 +121,7 @@ namespace Microsoft.BotBuilderSamples
                     RetryPrompt = MessageFactory.Text("The attachment must be a jpeg/png image file."),
                 };
 
-                return await stepContext.PromptAsync(nameof(AttachmentPrompt), promptOptions, cancellationToken);
+                return await stepContext.PromptAsync(nameof(AttachmentPrompt), promptOptions, cancellationToken).ConfigureAwait(false);
             }
         }
 
@@ -130,7 +130,7 @@ namespace Microsoft.BotBuilderSamples
             stepContext.Values["picture"] = ((IList<Attachment>)stepContext.Result)?.FirstOrDefault();
 
             // WaterfallStep always finishes with the end of the Waterfall or with another dialog; here it is a Prompt Dialog.
-            return await stepContext.PromptAsync(nameof(ConfirmPrompt), new PromptOptions { Prompt = MessageFactory.Text("Is this ok?") }, cancellationToken);
+            return await stepContext.PromptAsync(nameof(ConfirmPrompt), new PromptOptions { Prompt = MessageFactory.Text("Is this ok?") }, cancellationToken).ConfigureAwait(false);
         }
 
         private async Task<DialogTurnResult> SummaryStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
@@ -138,7 +138,7 @@ namespace Microsoft.BotBuilderSamples
             if ((bool)stepContext.Result)
             {
                 // Get the current profile object from user state.
-                var userProfile = await _userProfileAccessor.GetAsync(stepContext.Context, () => new UserProfile(), cancellationToken);
+                var userProfile = await _userProfileAccessor.GetAsync(stepContext.Context, () => new UserProfile(), cancellationToken).ConfigureAwait(false);
 
                 userProfile.Transport = (string)stepContext.Values["transport"];
                 userProfile.Name = (string)stepContext.Values["name"];
@@ -154,27 +154,27 @@ namespace Microsoft.BotBuilderSamples
 
                 msg += ".";
 
-                await stepContext.Context.SendActivityAsync(MessageFactory.Text(msg), cancellationToken);
+                await stepContext.Context.SendActivityAsync(MessageFactory.Text(msg), cancellationToken).ConfigureAwait(false);
 
                 if (userProfile.Picture != null)
                 {
                     try
                     {
-                        await stepContext.Context.SendActivityAsync(MessageFactory.Attachment(userProfile.Picture, "This is your profile picture."), cancellationToken);
+                        await stepContext.Context.SendActivityAsync(MessageFactory.Attachment(userProfile.Picture, "This is your profile picture."), cancellationToken).ConfigureAwait(false);
                     }
                     catch
                     {
-                        await stepContext.Context.SendActivityAsync(MessageFactory.Text("A profile picture was saved but could not be displayed here."), cancellationToken);
+                        await stepContext.Context.SendActivityAsync(MessageFactory.Text("A profile picture was saved but could not be displayed here."), cancellationToken).ConfigureAwait(false);
                     }
                 }
             }
             else
             {
-                await stepContext.Context.SendActivityAsync(MessageFactory.Text("Thanks. Your profile will not be kept."), cancellationToken);
+                await stepContext.Context.SendActivityAsync(MessageFactory.Text("Thanks. Your profile will not be kept."), cancellationToken).ConfigureAwait(false);
             }
 
             // WaterfallStep always finishes with the end of the Waterfall or with another dialog; here it is the end.
-            return await stepContext.EndDialogAsync(cancellationToken: cancellationToken);
+            return await stepContext.EndDialogAsync(cancellationToken: cancellationToken).ConfigureAwait(false);
         }
 
         private static Task<bool> AgePromptValidatorAsync(PromptValidatorContext<int> promptContext, CancellationToken cancellationToken)
@@ -205,7 +205,7 @@ namespace Microsoft.BotBuilderSamples
             }
             else
             {
-                await promptContext.Context.SendActivityAsync("No attachments received. Proceeding without a profile picture...");
+                await promptContext.Context.SendActivityAsync("No attachments received. Proceeding without a profile picture...").ConfigureAwait(false);
 
                 // We can return true from a validator function even if Recognized.Succeeded is false.
                 return true;
