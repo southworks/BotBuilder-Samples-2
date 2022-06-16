@@ -19,7 +19,7 @@ namespace Microsoft.BotBuilderSamples
         protected override async Task OnMembersAddedAsync(IList<ChannelAccount> membersAdded, ITurnContext<IConversationUpdateActivity> turnContext, CancellationToken cancellationToken)
         {
             // Send a welcome message to the user and tell them what actions they may perform to use this bot
-            await SendWelcomeMessageAsync(turnContext, cancellationToken);
+            await SendWelcomeMessageAsync(turnContext, cancellationToken).ConfigureAwait(false);
         }
 
         protected override async Task OnMessageActivityAsync(ITurnContext<IMessageActivity> turnContext, CancellationToken cancellationToken)
@@ -31,9 +31,9 @@ namespace Microsoft.BotBuilderSamples
             var responseText = ProcessInput(text);
 
             // Respond to the user.
-            await turnContext.SendActivityAsync(responseText, cancellationToken: cancellationToken);
+            await turnContext.SendActivityAsync(responseText, cancellationToken: cancellationToken).ConfigureAwait(false);
 
-            await SendSuggestedActionsAsync(turnContext, cancellationToken);
+            await SendSuggestedActionsAsync(turnContext, cancellationToken).ConfigureAwait(false);
         }
 
         private static async Task SendWelcomeMessageAsync(ITurnContext turnContext, CancellationToken cancellationToken)
@@ -44,8 +44,8 @@ namespace Microsoft.BotBuilderSamples
                 {
                     await turnContext.SendActivityAsync(
                         $"Welcome to SuggestedActionsBot {member.Name}. {WelcomeText}",
-                        cancellationToken: cancellationToken);
-                    await SendSuggestedActionsAsync(turnContext, cancellationToken);
+                        cancellationToken: cancellationToken).ConfigureAwait(false);
+                    await SendSuggestedActionsAsync(turnContext, cancellationToken).ConfigureAwait(false);
                 }
             }
         }
@@ -94,7 +94,7 @@ namespace Microsoft.BotBuilderSamples
                     new CardAction() { Title = "Blue", Type = ActionTypes.ImBack, Value = "Blue", Image = "https://via.placeholder.com/20/0000FF?text=B", ImageAltText = "B" },
                 },
             };
-            await turnContext.SendActivityAsync(reply, cancellationToken);
+            await turnContext.SendActivityAsync(reply, cancellationToken).ConfigureAwait(false);
         }
     }
 }
