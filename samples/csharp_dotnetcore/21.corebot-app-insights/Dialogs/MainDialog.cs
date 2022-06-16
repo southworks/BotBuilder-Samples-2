@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -17,7 +18,7 @@ namespace Microsoft.BotBuilderSamples.Dialogs
     public class MainDialog : ComponentDialog
     {
         private readonly FlightBookingRecognizer _luisRecognizer;
-        protected readonly ILogger Logger;
+        private readonly ILogger Logger;
 
         // Dependency injection uses this constructor to instantiate MainDialog
         public MainDialog(FlightBookingRecognizer luisRecognizer, BookingDialog bookingDialog, IBotTelemetryClient telemetryClient, ILogger<MainDialog> logger)
@@ -44,16 +45,16 @@ namespace Microsoft.BotBuilderSamples.Dialogs
             if (!_luisRecognizer.IsConfigured)
             {
                 await stepContext.Context.SendActivityAsync(
-                    MessageFactory.Text("NOTE: LUIS is not configured. To enable all capabilities, add 'LuisAppId', 'LuisAPIKey' and 'LuisAPIHostName' to the appsettings.json file.", inputHint: InputHints.IgnoringInput), cancellationToken);
+                    MessageFactory.Text("NOTE: LUIS is not configured. To enable all capabilities, add 'LuisAppId', 'LuisAPIKey' and 'LuisAPIHostName' to the appsettings.json file.", inputHint: InputHints.IgnoringInput), cancellationToken).ConfigureAwait(false);
 
-                return await stepContext.NextAsync(null, cancellationToken);
+                return await stepContext.NextAsync(null, cancellationToken).ConfigureAwait(false);
             }
 
             // Use the text provided in FinalStepAsync or the default if it is the first time.
-            var weekLaterDate = DateTime.Now.AddDays(7).ToString("MMMM d, yyyy");
+            var weekLaterDate = DateTime.Now.AddDays(7).ToString("MMMM d, yyyy", CultureInfo.CurrentCulture);
             var messageText = stepContext.Options?.ToString() ?? $"What can I help you with today?\nSay something like \"Book a flight from Paris to Berlin on {weekLaterDate}\"";
             var promptMessage = MessageFactory.Text(messageText, messageText, InputHints.ExpectingInput);
-            return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = promptMessage }, cancellationToken);
+            return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = promptMessage }, cancellationToken).ConfigureAwait(false);
         }
 
         private async Task<DialogTurnResult> ActStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
@@ -61,15 +62,15 @@ namespace Microsoft.BotBuilderSamples.Dialogs
             if (!_luisRecognizer.IsConfigured)
             {
                 // LUIS is not configured, we just run the BookingDialog path with an empty BookingDetailsInstance.
-                return await stepContext.BeginDialogAsync(nameof(BookingDialog), new BookingDetails(), cancellationToken);
+                return await stepContext.BeginDialogAsync(nameof(BookingDialog), new BookingDetails(), cancellationToken).ConfigureAwait(false);
             }
 
             // Call LUIS and gather any potential booking details. (Note the TurnContext has the response to the prompt.)
-            var luisResult = await _luisRecognizer.RecognizeAsync<FlightBooking>(stepContext.Context, cancellationToken);
+            var luisResult = await _luisRecognizer.RecognizeAsync<FlightBooking>(stepContext.Context, cancellationToken).ConfigureAwait(false);
             switch (luisResult.TopIntent().intent)
             {
                 case FlightBooking.Intent.BookFlight:
-                    await ShowWarningForUnsupportedCities(stepContext.Context, luisResult, cancellationToken);
+                    await ShowWarningForUnsupportedCities(stepContext.Context, luisResult, cancellationToken).ConfigureAwait(false);
 
                     // Initialize BookingDetails with any entities we may have found in the response.
                     var bookingDetails = new BookingDetails()
@@ -81,24 +82,24 @@ namespace Microsoft.BotBuilderSamples.Dialogs
                     };
 
                     // Run the BookingDialog giving it whatever details we have from the LUIS call, it will fill out the remainder.
-                    return await stepContext.BeginDialogAsync(nameof(BookingDialog), bookingDetails, cancellationToken);
+                    return await stepContext.BeginDialogAsync(nameof(BookingDialog), bookingDetails, cancellationToken).ConfigureAwait(false);
 
                 case FlightBooking.Intent.GetWeather:
                     // We haven't implemented the GetWeatherDialog so we just display a TODO message.
                     var getWeatherMessageText = "TODO: get weather flow here";
                     var getWeatherMessage = MessageFactory.Text(getWeatherMessageText, getWeatherMessageText, InputHints.IgnoringInput);
-                    await stepContext.Context.SendActivityAsync(getWeatherMessage, cancellationToken);
+                    await stepContext.Context.SendActivityAsync(getWeatherMessage, cancellationToken).ConfigureAwait(false);
                     break;
 
                 default:
                     // Catch all for unhandled intents
                     var didntUnderstandMessageText = $"Sorry, I didn't get that. Please try asking in a different way (intent was {luisResult.TopIntent().intent})";
                     var didntUnderstandMessage = MessageFactory.Text(didntUnderstandMessageText, didntUnderstandMessageText, InputHints.IgnoringInput);
-                    await stepContext.Context.SendActivityAsync(didntUnderstandMessage, cancellationToken);
+                    await stepContext.Context.SendActivityAsync(didntUnderstandMessage, cancellationToken).ConfigureAwait(false);
                     break;
             }
 
-            return await stepContext.NextAsync(null, cancellationToken);
+            return await stepContext.NextAsync(null, cancellationToken).ConfigureAwait(false);
         }
 
         // Shows a warning if the requested From or To cities are recognized as entities but they are not in the Airport entity list.
@@ -124,7 +125,7 @@ namespace Microsoft.BotBuilderSamples.Dialogs
             {
                 var messageText = $"Sorry but the following airports are not supported: {string.Join(',', unsupportedCities)}";
                 var message = MessageFactory.Text(messageText, messageText, InputHints.IgnoringInput);
-                await context.SendActivityAsync(message, cancellationToken);
+                await context.SendActivityAsync(message, cancellationToken).ConfigureAwait(false);
             }
         }
 
@@ -142,12 +143,12 @@ namespace Microsoft.BotBuilderSamples.Dialogs
                 var travelDateMsg = timeProperty.ToNaturalLanguage(DateTime.Now);
                 var messageText = $"I have you booked to {result.Destination} from {result.Origin} on {travelDateMsg}";
                 var message = MessageFactory.Text(messageText, messageText, InputHints.IgnoringInput);
-                await stepContext.Context.SendActivityAsync(message, cancellationToken);
+                await stepContext.Context.SendActivityAsync(message, cancellationToken).ConfigureAwait(false);
             }
 
             // Restart the main dialog with a different message the second time around
             var promptMessage = "What else can I do for you?";
-            return await stepContext.ReplaceDialogAsync(InitialDialogId, promptMessage, cancellationToken);
+            return await stepContext.ReplaceDialogAsync(InitialDialogId, promptMessage, cancellationToken).ConfigureAwait(false);
         }
     }
 }

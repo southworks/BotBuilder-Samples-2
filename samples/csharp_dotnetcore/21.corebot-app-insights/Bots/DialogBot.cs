@@ -17,10 +17,13 @@ namespace Microsoft.BotBuilderSamples.Bots
     // and the requirement is that all BotState objects are saved at the end of a turn.
     public class DialogBot<T> : ActivityHandler where T : Dialog
     {
+
+#pragma warning disable CA1051 // Do not declare visible instance fields. We exclude this rule because the child class DialogAndWelcomeBot sohuld call its parant's RunAsync method.
         protected readonly Dialog Dialog;
         protected readonly BotState ConversationState;
         protected readonly BotState UserState;
         protected readonly ILogger Logger;
+#pragma warning restore CA1051 // Do not declare visible instance fields
 
         public DialogBot(ConversationState conversationState, UserState userState, T dialog, ILogger<DialogBot<T>> logger)
         {
@@ -32,11 +35,11 @@ namespace Microsoft.BotBuilderSamples.Bots
 
         public override async Task OnTurnAsync(ITurnContext turnContext, CancellationToken cancellationToken = default(CancellationToken))
         {
-            await base.OnTurnAsync(turnContext, cancellationToken);
+            await base.OnTurnAsync(turnContext, cancellationToken).ConfigureAwait(false);
 
             // Save any state changes that might have occurred during the turn.
-            await ConversationState.SaveChangesAsync(turnContext, false, cancellationToken);
-            await UserState.SaveChangesAsync(turnContext, false, cancellationToken);
+            await ConversationState.SaveChangesAsync(turnContext, false, cancellationToken).ConfigureAwait(false);
+            await UserState.SaveChangesAsync(turnContext, false, cancellationToken).ConfigureAwait(false);
         }
 
         protected override async Task OnMessageActivityAsync(ITurnContext<IMessageActivity> turnContext, CancellationToken cancellationToken)
@@ -44,7 +47,7 @@ namespace Microsoft.BotBuilderSamples.Bots
             Logger.LogInformation("Running dialog with Message Activity.");
 
             // Run the Dialog with the new message Activity.
-            await Dialog.RunAsync(turnContext, ConversationState.CreateProperty<DialogState>("DialogState"), cancellationToken);
+            await Dialog.RunAsync(turnContext, ConversationState.CreateProperty<DialogState>("DialogState"), cancellationToken).ConfigureAwait(false);
         }
     }
 }
