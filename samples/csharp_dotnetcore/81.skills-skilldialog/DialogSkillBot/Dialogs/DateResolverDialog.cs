@@ -60,7 +60,7 @@ namespace Microsoft.BotBuilderSamples.DialogSkillBot.Dialogs
                     {
                         Prompt = promptMessage,
                         RetryPrompt = repromptMessage,
-                    }, cancellationToken);
+                    }, cancellationToken).ConfigureAwait(false);
             }
 
             // We have a Date we just need to check it is unambiguous.
@@ -73,16 +73,16 @@ namespace Microsoft.BotBuilderSamples.DialogSkillBot.Dialogs
                     new PromptOptions
                     {
                         Prompt = repromptMessage,
-                    }, cancellationToken);
+                    }, cancellationToken).ConfigureAwait(false);
             }
 
-            return await stepContext.NextAsync(new List<DateTimeResolution> { new DateTimeResolution { Timex = timex } }, cancellationToken);
+            return await stepContext.NextAsync(new List<DateTimeResolution> { new DateTimeResolution { Timex = timex } }, cancellationToken).ConfigureAwait(false);
         }
 
         private async Task<DialogTurnResult> FinalStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
             var timex = ((List<DateTimeResolution>)stepContext.Result)[0].Timex;
-            return await stepContext.EndDialogAsync(timex, cancellationToken);
+            return await stepContext.EndDialogAsync(timex, cancellationToken).ConfigureAwait(false);
         }
     }
 }

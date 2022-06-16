@@ -29,16 +29,16 @@ namespace Microsoft.BotBuilderSamples.DialogRootBot.Bots
             if (turnContext.Activity.Type != ActivityTypes.ConversationUpdate)
             {
                 // Run the Dialog with the Activity.
-                await _mainDialog.RunAsync(turnContext, _conversationState.CreateProperty<DialogState>("DialogState"), cancellationToken);
+                await _mainDialog.RunAsync(turnContext, _conversationState.CreateProperty<DialogState>("DialogState"), cancellationToken).ConfigureAwait(false);
             }
             else
             {
                 // Let the base class handle the activity.
-                await base.OnTurnAsync(turnContext, cancellationToken);
+                await base.OnTurnAsync(turnContext, cancellationToken).ConfigureAwait(false);
             }
 
             // Save any state changes that might have occurred during the turn.
-            await _conversationState.SaveChangesAsync(turnContext, false, cancellationToken);
+            await _conversationState.SaveChangesAsync(turnContext, false, cancellationToken).ConfigureAwait(false);
         }
 
         protected override async Task OnMembersAddedAsync(IList<ChannelAccount> membersAdded, ITurnContext<IConversationUpdateActivity> turnContext, CancellationToken cancellationToken)
@@ -52,8 +52,8 @@ namespace Microsoft.BotBuilderSamples.DialogRootBot.Bots
                     var welcomeCard = CreateAdaptiveCardAttachment();
                     var activity = MessageFactory.Attachment(welcomeCard);
                     activity.Speak = "Welcome to the Dialog Skill Prototype!";
-                    await turnContext.SendActivityAsync(activity, cancellationToken);
-                    await _mainDialog.RunAsync(turnContext, _conversationState.CreateProperty<DialogState>("DialogState"), cancellationToken);
+                    await turnContext.SendActivityAsync(activity, cancellationToken).ConfigureAwait(false);
+                    await _mainDialog.RunAsync(turnContext, _conversationState.CreateProperty<DialogState>("DialogState"), cancellationToken).ConfigureAwait(false);
                 }
             }
         }

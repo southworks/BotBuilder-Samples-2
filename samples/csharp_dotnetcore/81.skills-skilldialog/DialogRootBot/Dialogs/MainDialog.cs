@@ -78,18 +78,18 @@ namespace Microsoft.BotBuilderSamples.DialogRootBot.Dialogs
         protected override async Task<DialogTurnResult> OnContinueDialogAsync(DialogContext innerDc, CancellationToken cancellationToken = default)
         {
             // This is an example on how to cancel a SkillDialog that is currently in progress from the parent bot.
-            var activeSkill = await _activeSkillProperty.GetAsync(innerDc.Context, () => null, cancellationToken);
+            var activeSkill = await _activeSkillProperty.GetAsync(innerDc.Context, () => null, cancellationToken).ConfigureAwait(false);
             var activity = innerDc.Context.Activity;
-            if (activeSkill != null && activity.Type == ActivityTypes.Message && activity.Text.Equals("abort", StringComparison.CurrentCultureIgnoreCase))
+            if (activeSkill != null && activity.Type == ActivityTypes.Message && activity.Text.Equals("abort", StringComparison.OrdinalIgnoreCase))
             {
                 // Cancel all dialogs when the user says abort.
                 // The SkillDialog automatically sends an EndOfConversation message to the skill to let the
                 // skill know that it needs to end its current dialogs, too.
-                await innerDc.CancelAllDialogsAsync(cancellationToken);
-                return await innerDc.ReplaceDialogAsync(InitialDialogId, "Canceled! \n\n What skill would you like to call?", cancellationToken);
+                await innerDc.CancelAllDialogsAsync(cancellationToken).ConfigureAwait(false);
+                return await innerDc.ReplaceDialogAsync(InitialDialogId, "Canceled! \n\n What skill would you like to call?", cancellationToken).ConfigureAwait(false);
             }
 
-            return await base.OnContinueDialogAsync(innerDc, cancellationToken);
+            return await base.OnContinueDialogAsync(innerDc, cancellationToken).ConfigureAwait(false);
         }
 
         // Render a prompt to select the skill to call.
@@ -106,7 +106,7 @@ namespace Microsoft.BotBuilderSamples.DialogRootBot.Dialogs
             };
 
             // Prompt the user to select a skill.
-            return await stepContext.PromptAsync("SkillPrompt", options, cancellationToken);
+            return await stepContext.PromptAsync("SkillPrompt", options, cancellationToken).ConfigureAwait(false);
         }
 
         // Render a prompt to select the action for the skill.
@@ -128,7 +128,7 @@ namespace Microsoft.BotBuilderSamples.DialogRootBot.Dialogs
             };
 
             // Prompt the user to select a skill action.
-            return await stepContext.PromptAsync("SkillActionPrompt", options, cancellationToken);
+            return await stepContext.PromptAsync("SkillActionPrompt", options, cancellationToken).ConfigureAwait(false);
         }
 
         // This validator defaults to Message if the user doesn't select an existing option.
@@ -164,33 +164,33 @@ namespace Microsoft.BotBuilderSamples.DialogRootBot.Dialogs
             var skillDialogArgs = new BeginSkillDialogOptions { Activity = skillActivity };
 
             // Save active skill in state.
-            await _activeSkillProperty.SetAsync(stepContext.Context, selectedSkill, cancellationToken);
+            await _activeSkillProperty.SetAsync(stepContext.Context, selectedSkill, cancellationToken).ConfigureAwait(false);
 
             // Start the skillDialog instance with the arguments. 
-            return await stepContext.BeginDialogAsync(selectedSkill.Id, skillDialogArgs, cancellationToken);
+            return await stepContext.BeginDialogAsync(selectedSkill.Id, skillDialogArgs, cancellationToken).ConfigureAwait(false);
         }
 
         // The SkillDialog has ended, render the results (if any) and restart MainDialog.
         private async Task<DialogTurnResult> FinalStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
-            var activeSkill = await _activeSkillProperty.GetAsync(stepContext.Context, () => null, cancellationToken);
+            var activeSkill = await _activeSkillProperty.GetAsync(stepContext.Context, () => null, cancellationToken).ConfigureAwait(false);
 
             // Check if the skill returned any results and display them.
             if (stepContext.Result != null)
             {
                 var message = $"Skill \"{activeSkill.Id}\" invocation complete.";
                 message += $" Result: {JsonConvert.SerializeObject(stepContext.Result)}";
-                await stepContext.Context.SendActivityAsync(MessageFactory.Text(message, message, inputHint: InputHints.IgnoringInput), cancellationToken: cancellationToken);
+                await stepContext.Context.SendActivityAsync(MessageFactory.Text(message, message, inputHint: InputHints.IgnoringInput), cancellationToken: cancellationToken).ConfigureAwait(false);
             }
 
             // Clear the skill selected by the user.
             stepContext.Values[_selectedSkillKey] = null;
 
             // Clear active skill in state.
-            await _activeSkillProperty.DeleteAsync(stepContext.Context, cancellationToken);
+            await _activeSkillProperty.DeleteAsync(stepContext.Context, cancellationToken).ConfigureAwait(false);
 
             // Restart the main dialog with a different message the second time around.
-            return await stepContext.ReplaceDialogAsync(InitialDialogId, $"Done with \"{activeSkill.Id}\". \n\n What skill would you like to call?", cancellationToken);
+            return await stepContext.ReplaceDialogAsync(InitialDialogId, $"Done with \"{activeSkill.Id}\". \n\n What skill would you like to call?", cancellationToken).ConfigureAwait(false);
         }
 
         // Helper method that creates and adds SkillDialog instances for the configured skills.
@@ -241,7 +241,7 @@ namespace Microsoft.BotBuilderSamples.DialogRootBot.Dialogs
 
             Activity activity = null;
             // Just forward the message activity to the skill with whatever the user said. 
-            if (selectedOption.Equals(SkillActionMessage, StringComparison.CurrentCultureIgnoreCase))
+            if (selectedOption.Equals(SkillActionMessage, StringComparison.OrdinalIgnoreCase))
             {
                 // Note message activities also support input parameters but we are not using them in this example.
                 // Return a deep clone of the activity so we don't risk altering the original one 
@@ -249,14 +249,14 @@ namespace Microsoft.BotBuilderSamples.DialogRootBot.Dialogs
             }
 
             // Send an event activity to the skill with "BookFlight" in the name.
-            if (selectedOption.Equals(SkillActionBookFlight, StringComparison.CurrentCultureIgnoreCase))
+            if (selectedOption.Equals(SkillActionBookFlight, StringComparison.OrdinalIgnoreCase))
             {
                 activity = (Activity)Activity.CreateEventActivity();
                 activity.Name = SkillActionBookFlight;
             }
 
             // Send an event activity to the skill with "BookFlight" in the name and some testing values.
-            if (selectedOption.Equals(SkillActionBookFlightWithInputParameters, StringComparison.CurrentCultureIgnoreCase))
+            if (selectedOption.Equals(SkillActionBookFlightWithInputParameters, StringComparison.OrdinalIgnoreCase))
             {
                 activity = (Activity)Activity.CreateEventActivity();
                 activity.Name = SkillActionBookFlight;
@@ -264,7 +264,7 @@ namespace Microsoft.BotBuilderSamples.DialogRootBot.Dialogs
             }
 
             // Send an event activity to the skill with "GetWeather" in the name and some testing values.
-            if (selectedOption.Equals(SkillActionGetWeather, StringComparison.CurrentCultureIgnoreCase))
+            if (selectedOption.Equals(SkillActionGetWeather, StringComparison.OrdinalIgnoreCase))
             {
                 activity = (Activity)Activity.CreateEventActivity();
                 activity.Name = SkillActionGetWeather;

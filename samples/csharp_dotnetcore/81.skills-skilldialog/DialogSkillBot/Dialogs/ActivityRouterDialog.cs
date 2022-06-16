@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -36,19 +37,19 @@ namespace Microsoft.BotBuilderSamples.DialogSkillBot.Dialogs
         private async Task<DialogTurnResult> ProcessActivityAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
             // A skill can send trace activities, if needed.
-            await stepContext.Context.TraceActivityAsync($"{GetType().Name}.ProcessActivityAsync()", label: $"Got ActivityType: {stepContext.Context.Activity.Type}", cancellationToken: cancellationToken);
+            await stepContext.Context.TraceActivityAsync($"{GetType().Name}.ProcessActivityAsync()", label: $"Got ActivityType: {stepContext.Context.Activity.Type}", cancellationToken: cancellationToken).ConfigureAwait(false);
 
             switch (stepContext.Context.Activity.Type)
             {
                 case ActivityTypes.Event:
-                    return await OnEventActivityAsync(stepContext, cancellationToken);
+                    return await OnEventActivityAsync(stepContext, cancellationToken).ConfigureAwait(false);
 
                 case ActivityTypes.Message:
-                    return await OnMessageActivityAsync(stepContext, cancellationToken);
+                    return await OnMessageActivityAsync(stepContext, cancellationToken).ConfigureAwait(false);
 
                 default:
                     // We didn't get an activity type we can handle.
-                    await stepContext.Context.SendActivityAsync(MessageFactory.Text($"Unrecognized ActivityType: \"{stepContext.Context.Activity.Type}\".", inputHint: InputHints.IgnoringInput), cancellationToken);
+                    await stepContext.Context.SendActivityAsync(MessageFactory.Text($"Unrecognized ActivityType: \"{stepContext.Context.Activity.Type}\".", inputHint: InputHints.IgnoringInput), cancellationToken).ConfigureAwait(false);
                     return new DialogTurnResult(DialogTurnStatus.Complete);
             }
         }
@@ -57,20 +58,20 @@ namespace Microsoft.BotBuilderSamples.DialogSkillBot.Dialogs
         private async Task<DialogTurnResult> OnEventActivityAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
             var activity = stepContext.Context.Activity;
-            await stepContext.Context.TraceActivityAsync($"{GetType().Name}.OnEventActivityAsync()", label: $"Name: {activity.Name}. Value: {GetObjectAsJsonString(activity.Value)}", cancellationToken: cancellationToken);
+            await stepContext.Context.TraceActivityAsync($"{GetType().Name}.OnEventActivityAsync()", label: $"Name: {activity.Name}. Value: {GetObjectAsJsonString(activity.Value)}", cancellationToken: cancellationToken).ConfigureAwait(false);
 
             // Resolve what to execute based on the event name.
             switch (activity.Name)
             {
                 case "BookFlight":
-                    return await BeginBookFlight(stepContext, cancellationToken);
+                    return await BeginBookFlight(stepContext, cancellationToken).ConfigureAwait(false);
 
                 case "GetWeather":
-                    return await BeginGetWeather(stepContext, cancellationToken);
+                    return await BeginGetWeather(stepContext, cancellationToken).ConfigureAwait(false);
 
                 default:
                     // We didn't get an event name we can handle.
-                    await stepContext.Context.SendActivityAsync(MessageFactory.Text($"Unrecognized EventName: \"{activity.Name}\".", inputHint: InputHints.IgnoringInput), cancellationToken);
+                    await stepContext.Context.SendActivityAsync(MessageFactory.Text($"Unrecognized EventName: \"{activity.Name}\".", inputHint: InputHints.IgnoringInput), cancellationToken).ConfigureAwait(false);
                     return new DialogTurnResult(DialogTurnStatus.Complete);
             }
         }
@@ -79,39 +80,39 @@ namespace Microsoft.BotBuilderSamples.DialogSkillBot.Dialogs
         private async Task<DialogTurnResult> OnMessageActivityAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
             var activity = stepContext.Context.Activity;
-            await stepContext.Context.TraceActivityAsync($"{GetType().Name}.OnMessageActivityAsync()", label: $"Text: \"{activity.Text}\". Value: {GetObjectAsJsonString(activity.Value)}", cancellationToken: cancellationToken);
+            await stepContext.Context.TraceActivityAsync($"{GetType().Name}.OnMessageActivityAsync()", label: $"Text: \"{activity.Text}\". Value: {GetObjectAsJsonString(activity.Value)}", cancellationToken: cancellationToken).ConfigureAwait(false);
 
             if (!_luisRecognizer.IsConfigured)
             {
-                await stepContext.Context.SendActivityAsync(MessageFactory.Text("NOTE: LUIS is not configured. To enable all capabilities, add 'LuisAppId', 'LuisAPIKey' and 'LuisAPIHostName' to the appsettings.json file.", inputHint: InputHints.IgnoringInput), cancellationToken);
+                await stepContext.Context.SendActivityAsync(MessageFactory.Text("NOTE: LUIS is not configured. To enable all capabilities, add 'LuisAppId', 'LuisAPIKey' and 'LuisAPIHostName' to the appsettings.json file.", inputHint: InputHints.IgnoringInput), cancellationToken).ConfigureAwait(false);
             }
             else
             {
                 // Call LUIS with the utterance.
-                var luisResult = await _luisRecognizer.RecognizeAsync<FlightBooking>(stepContext.Context, cancellationToken);
+                var luisResult = await _luisRecognizer.RecognizeAsync<FlightBooking>(stepContext.Context, cancellationToken).ConfigureAwait(false);
 
                 // Create a message showing the LUIS results.
                 var sb = new StringBuilder();
-                sb.AppendLine($"LUIS results for \"{activity.Text}\":");
+                sb.AppendLine(CultureInfo.CurrentCulture, $"LUIS results for \"{activity.Text}\":");
                 var (intent, intentScore) = luisResult.Intents.FirstOrDefault(x => x.Value.Equals(luisResult.Intents.Values.Max()));
-                sb.AppendLine($"Intent: \"{intent}\" Score: {intentScore.Score}");
+                sb.AppendLine(CultureInfo.CurrentCulture, $"Intent: \"{intent}\" Score: {intentScore.Score}");
 
-                await stepContext.Context.SendActivityAsync(MessageFactory.Text(sb.ToString(), inputHint: InputHints.IgnoringInput), cancellationToken);
+                await stepContext.Context.SendActivityAsync(MessageFactory.Text(sb.ToString(), inputHint: InputHints.IgnoringInput), cancellationToken).ConfigureAwait(false);
 
                 // Start a dialog if we recognize the intent.
                 switch (luisResult.TopIntent().intent)
                 {
                     case FlightBooking.Intent.BookFlight:
-                        return await BeginBookFlight(stepContext, cancellationToken);
+                        return await BeginBookFlight(stepContext, cancellationToken).ConfigureAwait(false);
 
                     case FlightBooking.Intent.GetWeather:
-                        return await BeginGetWeather(stepContext, cancellationToken);
+                        return await BeginGetWeather(stepContext, cancellationToken).ConfigureAwait(false);
 
                     default:
                         // Catch all for unhandled intents.
                         var didntUnderstandMessageText = $"Sorry, I didn't get that. Please try asking in a different way (intent was {luisResult.TopIntent().intent})";
                         var didntUnderstandMessage = MessageFactory.Text(didntUnderstandMessageText, didntUnderstandMessageText, InputHints.IgnoringInput);
-                        await stepContext.Context.SendActivityAsync(didntUnderstandMessage, cancellationToken);
+                        await stepContext.Context.SendActivityAsync(didntUnderstandMessage, cancellationToken).ConfigureAwait(false);
                         break;
                 }
             }
@@ -131,7 +132,7 @@ namespace Microsoft.BotBuilderSamples.DialogSkillBot.Dialogs
             // We haven't implemented the GetWeatherDialog so we just display a TODO message.
             var getWeatherMessageText = $"TODO: get weather for here (lat: {location.Latitude}, long: {location.Longitude}";
             var getWeatherMessage = MessageFactory.Text(getWeatherMessageText, getWeatherMessageText, InputHints.IgnoringInput);
-            await stepContext.Context.SendActivityAsync(getWeatherMessage, cancellationToken);
+            await stepContext.Context.SendActivityAsync(getWeatherMessage, cancellationToken).ConfigureAwait(false);
             return new DialogTurnResult(DialogTurnStatus.Complete);
         }
 
@@ -146,7 +147,7 @@ namespace Microsoft.BotBuilderSamples.DialogSkillBot.Dialogs
 
             // Start the booking dialog.
             var bookingDialog = FindDialog(nameof(BookingDialog));
-            return await stepContext.BeginDialogAsync(bookingDialog.Id, bookingDetails, cancellationToken);
+            return await stepContext.BeginDialogAsync(bookingDialog.Id, bookingDetails, cancellationToken).ConfigureAwait(false);
         }
 
         private string GetObjectAsJsonString(object value) => value == null ? string.Empty : JsonConvert.SerializeObject(value);

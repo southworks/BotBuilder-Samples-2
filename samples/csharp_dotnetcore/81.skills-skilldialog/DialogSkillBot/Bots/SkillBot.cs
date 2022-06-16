@@ -22,10 +22,10 @@ namespace Microsoft.BotBuilderSamples.DialogSkillBot.Bots
 
         public override async Task OnTurnAsync(ITurnContext turnContext, CancellationToken cancellationToken = default)
         {
-            await _mainDialog.RunAsync(turnContext, _conversationState.CreateProperty<DialogState>("DialogState"), cancellationToken);
+            await _mainDialog.RunAsync(turnContext, _conversationState.CreateProperty<DialogState>("DialogState"), cancellationToken).ConfigureAwait(false);
 
             // Save any state changes that might have occurred during the turn.
-            await _conversationState.SaveChangesAsync(turnContext, false, cancellationToken);
+            await _conversationState.SaveChangesAsync(turnContext, false, cancellationToken).ConfigureAwait(false);
         }
     }
 }

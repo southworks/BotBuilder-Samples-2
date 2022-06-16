@@ -38,7 +38,7 @@ namespace Microsoft.BotBuilderSamples.DialogRootBot.Middleware
             turnContext.OnSendActivities(OutgoingHandler);
 
             // Continue processing messages.
-            await next(cancellationToken);
+            await next(cancellationToken).ConfigureAwait(false);
         }
 
         private async Task<ResourceResponse[]> OutgoingHandler(ITurnContext turnContext, List<Activity> activities, Func<Task<ResourceResponse[]>> next)
@@ -49,7 +49,7 @@ namespace Microsoft.BotBuilderSamples.DialogRootBot.Middleware
                 _logger.LogInformation(message);
             }
 
-            return await next();
+            return await next().ConfigureAwait(false);
         }
     }
 }

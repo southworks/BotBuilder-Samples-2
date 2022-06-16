@@ -31,6 +31,7 @@ namespace Microsoft.BotBuilderSamples.DialogSkillBot.CognitiveModels
         // This value will be a TIMEX. We are only interested in the Date part, so grab the first result and drop the Time part.
         // TIMEX is a format that represents DateTime expressions that include some ambiguity, such as a missing Year.
         public string TravelDate
-            => Enumerable.FirstOrDefault<string>(Entities.datetime?.FirstOrDefault()?.Expressions)?.Split('T')[0];
+            => (Entities.datetime[0]?.Expressions[0]).Split('T')[0];
+            //Enumerable.FirstOrDefault<string>(Entities.datetime?.FirstOrDefault()?.Expressions)?.Split('T')[0];
     }
 }
