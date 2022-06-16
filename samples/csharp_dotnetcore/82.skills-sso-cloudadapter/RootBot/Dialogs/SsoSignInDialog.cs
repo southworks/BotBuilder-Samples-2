@@ -25,21 +25,21 @@ namespace Microsoft.BotBuilderSamples.RootBot.Dialogs
 
         private async Task<DialogTurnResult> SignInStepAsync(WaterfallStepContext context, CancellationToken cancellationToken)
         {
-            return await context.BeginDialogAsync(nameof(OAuthPrompt), null, cancellationToken);
+            return await context.BeginDialogAsync(nameof(OAuthPrompt), null, cancellationToken).ConfigureAwait(false);
         }
 
         private async Task<DialogTurnResult> DisplayTokenAsync(WaterfallStepContext context, CancellationToken cancellationToken)
         {
             if (!(context.Result is TokenResponse result))
             {
-                await context.Context.SendActivityAsync("No token was provided.", cancellationToken: cancellationToken);
+                await context.Context.SendActivityAsync("No token was provided.", cancellationToken: cancellationToken).ConfigureAwait(false);
             }
             else
             {
-                await context.Context.SendActivityAsync($"Here is your token: {result.Token}", cancellationToken: cancellationToken);
+                await context.Context.SendActivityAsync($"Here is your token: {result.Token}", cancellationToken: cancellationToken).ConfigureAwait(false);
             }
 
-            return await context.EndDialogAsync(null, cancellationToken);
+            return await context.EndDialogAsync(null, cancellationToken).ConfigureAwait(false);
         }
     }
 }

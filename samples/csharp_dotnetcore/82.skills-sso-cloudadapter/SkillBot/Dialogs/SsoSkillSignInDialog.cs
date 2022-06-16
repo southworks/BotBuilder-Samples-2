@@ -26,21 +26,21 @@ namespace Microsoft.BotBuilderSamples.SkillBot.Dialogs
         private async Task<DialogTurnResult> SignInStepAsync(WaterfallStepContext context, CancellationToken cancellationToken)
         {
             // This prompt won't show if the user is signed in to the root using SSO.
-            return await context.BeginDialogAsync(nameof(OAuthPrompt), null, cancellationToken);
+            return await context.BeginDialogAsync(nameof(OAuthPrompt), null, cancellationToken).ConfigureAwait(false);
         }
 
         private async Task<DialogTurnResult> DisplayTokenAsync(WaterfallStepContext context, CancellationToken cancellationToken)
         {
             if (!(context.Result is TokenResponse result))
             {
-                await context.Context.SendActivityAsync("No token was provided for the skill.", cancellationToken: cancellationToken);
+                await context.Context.SendActivityAsync("No token was provided for the skill.", cancellationToken: cancellationToken).ConfigureAwait(false);
             }
             else
             {
-                await context.Context.SendActivityAsync($"Here is your token for the skill: {result.Token}", cancellationToken: cancellationToken);
+                await context.Context.SendActivityAsync($"Here is your token for the skill: {result.Token}", cancellationToken: cancellationToken).ConfigureAwait(false);
             }
 
-            return await context.EndDialogAsync(null, cancellationToken);
+            return await context.EndDialogAsync(null, cancellationToken).ConfigureAwait(false);
         }
     }
 }

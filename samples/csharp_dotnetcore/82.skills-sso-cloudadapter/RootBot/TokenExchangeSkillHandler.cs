@@ -81,7 +81,7 @@ namespace Microsoft.BotBuilderSamples.RootBot
                 return null;
             }
 
-            return _skillsConfig.Skills.Values.FirstOrDefault(s => string.Equals(s.AppId, appId, StringComparison.InvariantCultureIgnoreCase));
+            return _skillsConfig.Skills.Values.FirstOrDefault(s => string.Equals(s.AppId, appId, StringComparison.Ordinal));
         }
 
         private async Task<bool> InterceptOAuthCardsAsync(ClaimsIdentity claimsIdentity, Activity activity, CancellationToken cancellationToken)
@@ -157,7 +157,7 @@ namespace Microsoft.BotBuilderSamples.RootBot
 
             // route the activity to the skill
             using var botFrameworkClient = _auth.CreateBotFrameworkClient();
-            var response = await botFrameworkClient.PostActivityAsync(_botId, targetSkill.AppId, targetSkill.SkillEndpoint, _skillsConfig.SkillHostEndpoint, incomingActivity.Conversation.Id, activity, cancellationToken);
+            var response = await botFrameworkClient.PostActivityAsync(_botId, targetSkill.AppId, targetSkill.SkillEndpoint, _skillsConfig.SkillHostEndpoint, incomingActivity.Conversation.Id, activity, cancellationToken).ConfigureAwait(false);
 
             // Check response status: true if success, false if failure
             return response.IsSuccessStatusCode();

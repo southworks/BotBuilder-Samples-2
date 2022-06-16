@@ -49,11 +49,11 @@ namespace Microsoft.BotBuilderSamples.SkillBot.Dialogs
             {
                 Prompt = MessageFactory.Text(messageText, messageText, InputHints.ExpectingInput),
                 RetryPrompt = MessageFactory.Text(repromptMessageText, repromptMessageText, InputHints.ExpectingInput),
-                Choices = await GetPromptChoicesAsync(stepContext, cancellationToken)
+                Choices = await GetPromptChoicesAsync(stepContext, cancellationToken).ConfigureAwait(false)
             };
 
             // Prompt the user to select a skill.
-            return await stepContext.PromptAsync("ActionStepPrompt", options, cancellationToken);
+            return await stepContext.PromptAsync("ActionStepPrompt", options, cancellationToken).ConfigureAwait(false);
         }
 
         private async Task<List<Choice>> GetPromptChoicesAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
@@ -61,7 +61,7 @@ namespace Microsoft.BotBuilderSamples.SkillBot.Dialogs
             // Try to get the token for the current user to determine if it is logged in or not.
             var userId = stepContext.Context.Activity?.From?.Id;
             var userTokenClient = stepContext.Context.TurnState.Get<UserTokenClient>();
-            var token = await userTokenClient.GetUserTokenAsync(userId, _connectionName, stepContext.Context.Activity?.ChannelId, null, cancellationToken);
+            var token = await userTokenClient.GetUserTokenAsync(userId, _connectionName, stepContext.Context.Activity?.ChannelId, null, cancellationToken).ConfigureAwait(false);
 
             // Present different choices depending on the user's sign in status.
             var promptChoices = new List<Choice>();
@@ -90,26 +90,26 @@ namespace Microsoft.BotBuilderSamples.SkillBot.Dialogs
             {
                 case "login to the skill":
                     // The SsoSkillSignInDialog will just show the user token if the user logged on to the root bot.
-                    return await stepContext.BeginDialogAsync(nameof(SsoSkillSignInDialog), null, cancellationToken);
+                    return await stepContext.BeginDialogAsync(nameof(SsoSkillSignInDialog), null, cancellationToken).ConfigureAwait(false);
 
                 case "logout from the skill":
                     // This will just clear the token from the skill.
-                    await userTokenClient.SignOutUserAsync(userId, _connectionName, stepContext.Context.Activity?.ChannelId, cancellationToken);
-                    await stepContext.Context.SendActivityAsync("You have been signed out.", cancellationToken: cancellationToken);
-                    return await stepContext.NextAsync(cancellationToken: cancellationToken);
+                    await userTokenClient.SignOutUserAsync(userId, _connectionName, stepContext.Context.Activity?.ChannelId, cancellationToken).ConfigureAwait(false);
+                    await stepContext.Context.SendActivityAsync("You have been signed out.", cancellationToken: cancellationToken).ConfigureAwait(false);
+                    return await stepContext.NextAsync(cancellationToken: cancellationToken).ConfigureAwait(false);
 
                 case "show token":
-                    var token = await userTokenClient.GetUserTokenAsync(userId, _connectionName, stepContext.Context.Activity?.ChannelId, null, cancellationToken);
+                    var token = await userTokenClient.GetUserTokenAsync(userId, _connectionName, stepContext.Context.Activity?.ChannelId, null, cancellationToken).ConfigureAwait(false);
                     if (token == null)
                     {
-                        await stepContext.Context.SendActivityAsync("User has no cached token.", cancellationToken: cancellationToken);
+                        await stepContext.Context.SendActivityAsync("User has no cached token.", cancellationToken: cancellationToken).ConfigureAwait(false);
                     }
                     else
                     {
-                        await stepContext.Context.SendActivityAsync($"Here is your current SSO token for the skill: {token.Token}", cancellationToken: cancellationToken);
+                        await stepContext.Context.SendActivityAsync($"Here is your current SSO token for the skill: {token.Token}", cancellationToken: cancellationToken).ConfigureAwait(false);
                     }
 
-                    return await stepContext.NextAsync(cancellationToken: cancellationToken);
+                    return await stepContext.NextAsync(cancellationToken: cancellationToken).ConfigureAwait(false);
 
                 case "end":
                     // Ends the interaction with the skill.
@@ -124,7 +124,7 @@ namespace Microsoft.BotBuilderSamples.SkillBot.Dialogs
         private async Task<DialogTurnResult> PromptFinalStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
             // Restart the dialog (we will exit when the user says "end").
-            return await stepContext.ReplaceDialogAsync(InitialDialogId, null, cancellationToken);
+            return await stepContext.ReplaceDialogAsync(InitialDialogId, null, cancellationToken).ConfigureAwait(false);
         }
     }
 }

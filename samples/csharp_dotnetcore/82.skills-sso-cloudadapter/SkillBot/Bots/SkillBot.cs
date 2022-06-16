@@ -8,7 +8,9 @@ using Microsoft.Bot.Builder.Dialogs;
 
 namespace Microsoft.BotBuilderSamples.SkillBot.Bots
 {
+#pragma warning disable CA1724 // Type names should not match namespaces (by design and we can't change this without breaking binary compat).
     public class SkillBot<T> : ActivityHandler
+#pragma warning restore CA1724
         where T : Dialog
     {
         private readonly ConversationState _conversationState;
@@ -22,10 +24,10 @@ namespace Microsoft.BotBuilderSamples.SkillBot.Bots
 
         public override async Task OnTurnAsync(ITurnContext turnContext, CancellationToken cancellationToken = default)
         {
-            await _mainDialog.RunAsync(turnContext, _conversationState.CreateProperty<DialogState>("DialogState"), cancellationToken);
+            await _mainDialog.RunAsync(turnContext, _conversationState.CreateProperty<DialogState>("DialogState"), cancellationToken).ConfigureAwait(false);
 
             // Save any state changes that might have occurred during the turn.
-            await _conversationState.SaveChangesAsync(turnContext, false, cancellationToken);
+            await _conversationState.SaveChangesAsync(turnContext, false, cancellationToken).ConfigureAwait(false);
         }
     }
 }

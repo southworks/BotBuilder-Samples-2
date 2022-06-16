@@ -56,9 +56,9 @@ namespace Microsoft.BotBuilderSamples.SkillBot
             // Log any leaked exception from the application.
             _logger.LogError(exception, $"[OnTurnError] unhandled error : {exception.Message}");
 
-            await SendErrorMessageAsync(turnContext, exception);
-            await SendEoCToParentAsync(turnContext, exception);
-            await ClearConversationStateAsync(turnContext);
+            await SendErrorMessageAsync(turnContext, exception).ConfigureAwait(false);
+            await SendEoCToParentAsync(turnContext, exception).ConfigureAwait(false);
+            await ClearConversationStateAsync(turnContext).ConfigureAwait(false);
         }
 
         private async Task SendErrorMessageAsync(ITurnContext turnContext, Exception exception)
@@ -68,16 +68,16 @@ namespace Microsoft.BotBuilderSamples.SkillBot
                 // Send a message to the user.
                 var errorMessageText = "The skill encountered an error or bug.";
                 var errorMessage = MessageFactory.Text(errorMessageText, errorMessageText, InputHints.IgnoringInput);
-                await turnContext.SendActivityAsync(errorMessage);
+                await turnContext.SendActivityAsync(errorMessage).ConfigureAwait(false);
 
                 errorMessageText = "To continue to run this bot, please fix the bot source code.";
                 errorMessage = MessageFactory.Text(errorMessageText, errorMessageText, InputHints.ExpectingInput);
-                await turnContext.SendActivityAsync(errorMessage);
+                await turnContext.SendActivityAsync(errorMessage).ConfigureAwait(false);
 
                 // Send a trace activity, which will be displayed in the Bot Framework Emulator.
                 // Note: we return the entire exception in the value property to help the developer;
                 // this should not be done in production.
-                await turnContext.TraceActivityAsync("OnTurnError Trace", exception.ToString(), "https://www.botframework.com/schemas/error", "TurnError");
+                await turnContext.TraceActivityAsync("OnTurnError Trace", exception.ToString(), "https://www.botframework.com/schemas/error", "TurnError").ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -94,7 +94,7 @@ namespace Microsoft.BotBuilderSamples.SkillBot
                 var endOfConversation = Activity.CreateEndOfConversationActivity();
                 endOfConversation.Code = "SkillError";
                 endOfConversation.Text = exception.Message;
-                await turnContext.SendActivityAsync(endOfConversation);
+                await turnContext.SendActivityAsync(endOfConversation).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -109,7 +109,7 @@ namespace Microsoft.BotBuilderSamples.SkillBot
                 // Delete the conversationState for the current conversation to prevent the
                 // bot from getting stuck in a error-loop caused by being in a bad state.
                 // ConversationState should be thought of as similar to "cookie-state" for a Web page.
-                await _conversationState.DeleteAsync(turnContext);
+                await _conversationState.DeleteAsync(turnContext).ConfigureAwait(false);
             }
             catch (Exception ex)
             {

@@ -44,9 +44,9 @@ namespace Microsoft.BotBuilderSamples.RootBot
             // to add telemetry capture to your bot.
             _logger.LogError(exception, $"[OnTurnError] unhandled error : {exception.Message}");
 
-            await SendErrorMessageAsync(turnContext, exception);
-            await EndSkillConversationAsync(turnContext);
-            await ClearConversationStateAsync(turnContext);
+            await SendErrorMessageAsync(turnContext, exception).ConfigureAwait(false);
+            await EndSkillConversationAsync(turnContext).ConfigureAwait(false);
+            await ClearConversationStateAsync(turnContext).ConfigureAwait(false);
         }
 
         private async Task SendErrorMessageAsync(ITurnContext turnContext, Exception exception)
@@ -56,14 +56,14 @@ namespace Microsoft.BotBuilderSamples.RootBot
                 // Send a message to the user.
                 var errorMessageText = "The bot encountered an error or bug.";
                 var errorMessage = MessageFactory.Text(errorMessageText, errorMessageText, InputHints.IgnoringInput);
-                await turnContext.SendActivityAsync(errorMessage);
+                await turnContext.SendActivityAsync(errorMessage).ConfigureAwait(false);
 
                 errorMessageText = "To continue to run this bot, please fix the bot source code.";
                 errorMessage = MessageFactory.Text(errorMessageText, errorMessageText, InputHints.ExpectingInput);
-                await turnContext.SendActivityAsync(errorMessage);
+                await turnContext.SendActivityAsync(errorMessage).ConfigureAwait(false);
 
                 // Send a trace activity, which will be displayed in the Bot Framework Emulator.
-                await turnContext.TraceActivityAsync("OnTurnError Trace", exception.ToString(), "https://www.botframework.com/schemas/error", "TurnError");
+                await turnContext.TraceActivityAsync("OnTurnError Trace", exception.ToString(), "https://www.botframework.com/schemas/error", "TurnError").ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -83,7 +83,7 @@ namespace Microsoft.BotBuilderSamples.RootBot
                 // Inform the active skill that the conversation is ended so that it has a chance to clean up.
                 // Note: the root bot manages the ActiveSkillPropertyName, which has a value while the root bot
                 // has an active conversation with a skill.
-                var activeSkill = await _conversationState.CreateProperty<BotFrameworkSkill>(MainDialog.ActiveSkillPropertyName).GetAsync(turnContext, () => null);
+                var activeSkill = await _conversationState.CreateProperty<BotFrameworkSkill>(MainDialog.ActiveSkillPropertyName).GetAsync(turnContext, () => null).ConfigureAwait(false);
                 if (activeSkill != null)
                 {
                     var botId = _configuration.GetSection(MicrosoftAppCredentials.MicrosoftAppIdKey)?.Value;
@@ -92,11 +92,11 @@ namespace Microsoft.BotBuilderSamples.RootBot
                     endOfConversation.Code = "RootSkillError";
                     endOfConversation.ApplyConversationReference(turnContext.Activity.GetConversationReference(), true);
 
-                    await _conversationState.SaveChangesAsync(turnContext, true);
+                    await _conversationState.SaveChangesAsync(turnContext, true).ConfigureAwait(false);
 
                     using var client = _auth.CreateBotFrameworkClient();
 
-                    await client.PostActivityAsync(botId, activeSkill.AppId, activeSkill.SkillEndpoint, _skillsConfig.SkillHostEndpoint, endOfConversation.Conversation.Id, (Activity)endOfConversation, CancellationToken.None);
+                    await client.PostActivityAsync(botId, activeSkill.AppId, activeSkill.SkillEndpoint, _skillsConfig.SkillHostEndpoint, endOfConversation.Conversation.Id, (Activity)endOfConversation, CancellationToken.None).ConfigureAwait(false);
                 }
             }
             catch (Exception ex)
@@ -112,7 +112,7 @@ namespace Microsoft.BotBuilderSamples.RootBot
                 // Delete the conversationState for the current conversation to prevent the
                 // bot from getting stuck in a error-loop caused by being in a bad state.
                 // ConversationState should be thought of as similar to "cookie-state" for a Web page.
-                await _conversationState.DeleteAsync(turnContext);
+                await _conversationState.DeleteAsync(turnContext).ConfigureAwait(false);
             }
             catch (Exception ex)
             {

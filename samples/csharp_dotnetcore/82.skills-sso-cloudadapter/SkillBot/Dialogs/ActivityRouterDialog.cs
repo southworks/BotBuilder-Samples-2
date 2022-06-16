@@ -29,16 +29,16 @@ namespace Microsoft.BotBuilderSamples.SkillBot.Dialogs
         private async Task<DialogTurnResult> ProcessActivityAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
             // A skill can send trace activities, if needed.
-            await stepContext.Context.TraceActivityAsync($"{GetType().Name}.ProcessActivityAsync()", label: $"Got ActivityType: {stepContext.Context.Activity.Type}", cancellationToken: cancellationToken);
+            await stepContext.Context.TraceActivityAsync($"{GetType().Name}.ProcessActivityAsync()", label: $"Got ActivityType: {stepContext.Context.Activity.Type}", cancellationToken: cancellationToken).ConfigureAwait(false);
 
             // In this simple skill, we only handle SSO events
             if (stepContext.Context.Activity.Type == ActivityTypes.Event && stepContext.Context.Activity.Name == "SSO")
             {
-                return await stepContext.BeginDialogAsync(nameof(SsoSkillDialog), cancellationToken: cancellationToken);
+                return await stepContext.BeginDialogAsync(nameof(SsoSkillDialog), cancellationToken: cancellationToken).ConfigureAwait(false);
             }
 
             // We didn't get an activity type we can handle.
-            await stepContext.Context.SendActivityAsync(MessageFactory.Text($"Unrecognized ActivityType: \"{stepContext.Context.Activity.Type}\".", inputHint: InputHints.IgnoringInput), cancellationToken);
+            await stepContext.Context.SendActivityAsync(MessageFactory.Text($"Unrecognized ActivityType: \"{stepContext.Context.Activity.Type}\".", inputHint: InputHints.IgnoringInput), cancellationToken).ConfigureAwait(false);
             return new DialogTurnResult(DialogTurnStatus.Complete);
         }
     }
