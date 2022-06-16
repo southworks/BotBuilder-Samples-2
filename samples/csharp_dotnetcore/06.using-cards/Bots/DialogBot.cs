@@ -1,6 +1,5 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
-#pragma warning disable CA1051 //Do not declare visible instance fields
 
 using System.Threading;
 using System.Threading.Tasks;
@@ -18,10 +17,10 @@ namespace Microsoft.BotBuilderSamples
     // and the requirement is that all BotState objects are saved at the end of a turn.
     public class DialogBot<T> : ActivityHandler where T : Dialog
     {
-        protected readonly BotState ConversationState;
-        protected readonly Dialog Dialog;
-        protected readonly ILogger Logger;
-        protected readonly BotState UserState;
+        private readonly BotState ConversationState;
+        private readonly Dialog Dialog;
+        private readonly ILogger Logger;
+        private readonly BotState UserState;
 
         public DialogBot(ConversationState conversationState, UserState userState, T dialog, ILogger<DialogBot<T>> logger)
         {
