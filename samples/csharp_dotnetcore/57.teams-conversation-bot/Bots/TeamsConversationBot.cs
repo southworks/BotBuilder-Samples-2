@@ -18,6 +18,7 @@ using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json.Linq;
 using AdaptiveCards.Templating;
 using Newtonsoft.Json;
+using System.Globalization;
 
 namespace Microsoft.BotBuilderSamples.Bots
 {
@@ -37,29 +38,29 @@ namespace Microsoft.BotBuilderSamples.Bots
         protected override async Task OnMessageActivityAsync(ITurnContext<IMessageActivity> turnContext, CancellationToken cancellationToken)
         {
             turnContext.Activity.RemoveRecipientMention();
-            var text = turnContext.Activity.Text.Trim().ToLower();
+            var text = turnContext.Activity.Text.Trim().ToLower(CultureInfo.CurrentCulture);
 
-            if (text.Contains("mention me"))
-                await MentionAdaptiveCardActivityAsync(turnContext, cancellationToken);
-            else if (text.Contains("mention"))
-                await MentionActivityAsync(turnContext, cancellationToken);
-            else if(text.Contains("who"))
-                await GetSingleMemberAsync(turnContext, cancellationToken);
-            else if(text.Contains("update"))
-                await CardActivityAsync(turnContext, true, cancellationToken);
-            else if(text.Contains("message"))
-                await MessageAllMembersAsync(turnContext, cancellationToken);
-            else if(text.Contains("delete"))
-                await DeleteCardActivityAsync(turnContext, cancellationToken);
+            if (text.Contains("mention me", StringComparison.Ordinal))
+                await MentionAdaptiveCardActivityAsync(turnContext, cancellationToken).ConfigureAwait(false);
+            else if (text.Contains("mention", StringComparison.Ordinal))
+                await MentionActivityAsync(turnContext, cancellationToken).ConfigureAwait(false);
+            else if(text.Contains("who", StringComparison.Ordinal))
+                await GetSingleMemberAsync(turnContext, cancellationToken).ConfigureAwait(false);
+            else if(text.Contains("update", StringComparison.Ordinal))
+                await CardActivityAsync(turnContext, true, cancellationToken).ConfigureAwait(false);
+            else if(text.Contains("message", StringComparison.Ordinal))
+                await MessageAllMembersAsync(turnContext, cancellationToken).ConfigureAwait(false);
+            else if(text.Contains("delete", StringComparison.Ordinal))
+                await DeleteCardActivityAsync(turnContext, cancellationToken).ConfigureAwait(false);
             else
-                await CardActivityAsync(turnContext, false, cancellationToken);
+                await CardActivityAsync(turnContext, false, cancellationToken).ConfigureAwait(false);
         }
 
         protected override async Task OnTeamsMembersAddedAsync(IList<TeamsChannelAccount> membersAdded, TeamInfo teamInfo, ITurnContext<IConversationUpdateActivity> turnContext, CancellationToken cancellationToken)
         {
             foreach (var teamMember in membersAdded)
             {
-                await turnContext.SendActivityAsync(MessageFactory.Text($"Welcome to the team {teamMember.GivenName} {teamMember.Surname}."), cancellationToken);
+                await turnContext.SendActivityAsync(MessageFactory.Text($"Welcome to the team {teamMember.GivenName} {teamMember.Surname}."), cancellationToken).ConfigureAwait(false);
             }
         }
 
@@ -100,11 +101,11 @@ namespace Microsoft.BotBuilderSamples.Bots
 
             if (update)
             {
-                await SendUpdatedCard(turnContext, card, cancellationToken);
+                await SendUpdatedCard(turnContext, card, cancellationToken).ConfigureAwait(false);
             }
             else
             {
-                await SendWelcomeCard(turnContext, card, cancellationToken);
+                await SendWelcomeCard(turnContext, card, cancellationToken).ConfigureAwait(false);
             }
 
         }
@@ -115,13 +116,13 @@ namespace Microsoft.BotBuilderSamples.Bots
 
             try
             {
-                member = await TeamsInfo.GetMemberAsync(turnContext, turnContext.Activity.From.Id, cancellationToken);
+                member = await TeamsInfo.GetMemberAsync(turnContext, turnContext.Activity.From.Id, cancellationToken).ConfigureAwait(false);
             }
             catch (ErrorResponseException e)
             {
-                if (e.Body.Error.Code.Equals("MemberNotFoundInConversation"))
+                if (e.Body.Error.Code.Equals("MemberNotFoundInConversation", StringComparison.Ordinal))
                 {
-                    await turnContext.SendActivityAsync("Member not found.");
+                    await turnContext.SendActivityAsync("Member not found.").ConfigureAwait(false);
                     return;
                 }
                 else
@@ -131,13 +132,13 @@ namespace Microsoft.BotBuilderSamples.Bots
             }
 
             var message = MessageFactory.Text($"You are: {member.Name}.");
-            var res = await turnContext.SendActivityAsync(message);
+            var res = await turnContext.SendActivityAsync(message).ConfigureAwait(false);
 
         }
 
         private async Task DeleteCardActivityAsync(ITurnContext<IMessageActivity> turnContext, CancellationToken cancellationToken)
         {
-            await turnContext.DeleteActivityAsync(turnContext.Activity.ReplyToId, cancellationToken);
+            await turnContext.DeleteActivityAsync(turnContext.Activity.ReplyToId, cancellationToken).ConfigureAwait(false);
         }
 
         private async Task MessageAllMembersAsync(ITurnContext<IMessageActivity> turnContext, CancellationToken cancellationToken)
@@ -147,7 +148,7 @@ namespace Microsoft.BotBuilderSamples.Bots
             var credentials = new MicrosoftAppCredentials(_appId, _appPassword);
             ConversationReference conversationReference = null;
 
-            var members = await GetPagedMembers(turnContext, cancellationToken);
+            var members = await GetPagedMembers(turnContext, cancellationToken).ConfigureAwait(false);
 
             foreach (var teamMember in members)
             {
@@ -175,14 +176,14 @@ namespace Microsoft.BotBuilderSamples.Bots
                             conversationReference,
                             async (t2, c2) =>
                             {
-                                await t2.SendActivityAsync(proactiveMessage, c2);
+                                await t2.SendActivityAsync(proactiveMessage, c2).ConfigureAwait(false);
                             },
-                            cancellationToken);
+                            cancellationToken).ConfigureAwait(false);
                     },
-                    cancellationToken);
+                    cancellationToken).ConfigureAwait(false);
             }
 
-            await turnContext.SendActivityAsync(MessageFactory.Text("All messages have been sent."), cancellationToken);
+            await turnContext.SendActivityAsync(MessageFactory.Text("All messages have been sent."), cancellationToken).ConfigureAwait(false);
         }
 
         private static async Task<List<TeamsChannelAccount>> GetPagedMembers(ITurnContext<IMessageActivity> turnContext, CancellationToken cancellationToken)
@@ -192,7 +193,7 @@ namespace Microsoft.BotBuilderSamples.Bots
 
             do
             {
-                var currentPage = await TeamsInfo.GetPagedMembersAsync(turnContext, 100, continuationToken, cancellationToken);
+                var currentPage = await TeamsInfo.GetPagedMembersAsync(turnContext, 100, continuationToken, cancellationToken).ConfigureAwait(false);
                 continuationToken = currentPage.ContinuationToken;
                 members = members.Concat(currentPage.Members).ToList();
             }
@@ -215,7 +216,7 @@ namespace Microsoft.BotBuilderSamples.Bots
 
             var activity = MessageFactory.Attachment(card.ToAttachment());
 
-            await turnContext.SendActivityAsync(activity, cancellationToken);
+            await turnContext.SendActivityAsync(activity, cancellationToken).ConfigureAwait(false);
         }
 
         private static async Task SendUpdatedCard(ITurnContext<IMessageActivity> turnContext, HeroCard card, CancellationToken cancellationToken)
@@ -238,7 +239,7 @@ namespace Microsoft.BotBuilderSamples.Bots
             var activity = MessageFactory.Attachment(card.ToAttachment());
             activity.Id = turnContext.Activity.ReplyToId;
 
-            await turnContext.UpdateActivityAsync(activity, cancellationToken);
+            await turnContext.UpdateActivityAsync(activity, cancellationToken).ConfigureAwait(false);
         }
 
         private async Task MentionAdaptiveCardActivityAsync(ITurnContext<IMessageActivity> turnContext, CancellationToken cancellationToken)
@@ -247,13 +248,13 @@ namespace Microsoft.BotBuilderSamples.Bots
 
             try
             {
-                member = await TeamsInfo.GetMemberAsync(turnContext, turnContext.Activity.From.Id, cancellationToken);
+                member = await TeamsInfo.GetMemberAsync(turnContext, turnContext.Activity.From.Id, cancellationToken).ConfigureAwait(false);
             }
             catch (ErrorResponseException e)
             {
-                if (e.Body.Error.Code.Equals("MemberNotFoundInConversation"))
+                if (e.Body.Error.Code.Equals("MemberNotFoundInConversation", StringComparison.Ordinal))
                 {
-                    await turnContext.SendActivityAsync("Member not found.");
+                    await turnContext.SendActivityAsync("Member not found.").ConfigureAwait(false);
                     return;
                 }
                 else
@@ -276,7 +277,7 @@ namespace Microsoft.BotBuilderSamples.Bots
                 ContentType = "application/vnd.microsoft.card.adaptive",
                 Content = JsonConvert.DeserializeObject(cardJSON),
             };
-            await turnContext.SendActivityAsync(MessageFactory.Attachment(adaptiveCardAttachment), cancellationToken);
+            await turnContext.SendActivityAsync(MessageFactory.Attachment(adaptiveCardAttachment), cancellationToken).ConfigureAwait(false);
         }
 
         private async Task MentionActivityAsync(ITurnContext<IMessageActivity> turnContext, CancellationToken cancellationToken)
@@ -290,7 +291,7 @@ namespace Microsoft.BotBuilderSamples.Bots
             var replyActivity = MessageFactory.Text($"Hello {mention.Text}.");
             replyActivity.Entities = new List<Entity> { mention };
 
-            await turnContext.SendActivityAsync(replyActivity, cancellationToken);
+            await turnContext.SendActivityAsync(replyActivity, cancellationToken).ConfigureAwait(false);
         }
 
 
@@ -298,19 +299,19 @@ namespace Microsoft.BotBuilderSamples.Bots
         protected override async Task OnTeamsChannelCreatedAsync(ChannelInfo channelInfo, TeamInfo teamInfo, ITurnContext<IConversationUpdateActivity> turnContext, CancellationToken cancellationToken)
         {
             var heroCard = new HeroCard(text: $"{channelInfo.Name} is the Channel created");
-            await turnContext.SendActivityAsync(MessageFactory.Attachment(heroCard.ToAttachment()), cancellationToken);
+            await turnContext.SendActivityAsync(MessageFactory.Attachment(heroCard.ToAttachment()), cancellationToken).ConfigureAwait(false);
         }
 
         protected override async Task OnTeamsChannelRenamedAsync(ChannelInfo channelInfo, TeamInfo teamInfo, ITurnContext<IConversationUpdateActivity> turnContext, CancellationToken cancellationToken)
         {
             var heroCard = new HeroCard(text: $"{channelInfo.Name} is the new Channel name");
-            await turnContext.SendActivityAsync(MessageFactory.Attachment(heroCard.ToAttachment()), cancellationToken);
+            await turnContext.SendActivityAsync(MessageFactory.Attachment(heroCard.ToAttachment()), cancellationToken).ConfigureAwait(false);
         }
 
         protected override async Task OnTeamsChannelDeletedAsync(ChannelInfo channelInfo, TeamInfo teamInfo, ITurnContext<IConversationUpdateActivity> turnContext, CancellationToken cancellationToken)
         {
             var heroCard = new HeroCard(text: $"{channelInfo.Name} is the Channel deleted");
-            await turnContext.SendActivityAsync(MessageFactory.Attachment(heroCard.ToAttachment()), cancellationToken);
+            await turnContext.SendActivityAsync(MessageFactory.Attachment(heroCard.ToAttachment()), cancellationToken).ConfigureAwait(false);
         }
 
         protected override async Task OnTeamsMembersRemovedAsync(IList<TeamsChannelAccount> membersRemoved, TeamInfo teamInfo, ITurnContext<IConversationUpdateActivity> turnContext, CancellationToken cancellationToken)
@@ -325,7 +326,7 @@ namespace Microsoft.BotBuilderSamples.Bots
                 else
                 {
                     var heroCard = new HeroCard(text: $"{member.Name} was removed from {teamInfo.Name}");
-                    await turnContext.SendActivityAsync(MessageFactory.Attachment(heroCard.ToAttachment()), cancellationToken);
+                    await turnContext.SendActivityAsync(MessageFactory.Attachment(heroCard.ToAttachment()), cancellationToken).ConfigureAwait(false);
                 }
             }
         }
@@ -333,7 +334,7 @@ namespace Microsoft.BotBuilderSamples.Bots
         protected override async Task OnTeamsTeamRenamedAsync(TeamInfo teamInfo, ITurnContext<IConversationUpdateActivity> turnContext, CancellationToken cancellationToken)
         {
             var heroCard = new HeroCard(text: $"{teamInfo.Name} is the new Team name");
-            await turnContext.SendActivityAsync(MessageFactory.Attachment(heroCard.ToAttachment()), cancellationToken);
+            await turnContext.SendActivityAsync(MessageFactory.Attachment(heroCard.ToAttachment()), cancellationToken).ConfigureAwait(false);
         }
         protected override async Task OnReactionsAddedAsync(IList<MessageReaction> messageReactions, ITurnContext<IMessageReactionActivity> turnContext, CancellationToken cancellationToken)
         {
@@ -341,7 +342,7 @@ namespace Microsoft.BotBuilderSamples.Bots
             {
                 var newReaction = $"You reacted with '{reaction.Type}' to the following message: '{turnContext.Activity.ReplyToId}'";
                 var replyActivity = MessageFactory.Text(newReaction);
-                await turnContext.SendActivityAsync(replyActivity, cancellationToken);
+                await turnContext.SendActivityAsync(replyActivity, cancellationToken).ConfigureAwait(false);
             }
         }
 
@@ -351,7 +352,7 @@ namespace Microsoft.BotBuilderSamples.Bots
             {
                 var newReaction = $"You removed the reaction '{reaction.Type}' from the following message: '{turnContext.Activity.ReplyToId}'";
                 var replyActivity = MessageFactory.Text(newReaction);
-                await turnContext.SendActivityAsync(replyActivity, cancellationToken);
+                await turnContext.SendActivityAsync(replyActivity, cancellationToken).ConfigureAwait(false);
             }
         }
     }
