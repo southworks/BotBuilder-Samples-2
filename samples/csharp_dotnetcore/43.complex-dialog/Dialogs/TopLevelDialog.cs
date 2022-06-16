@@ -11,8 +11,6 @@ namespace Microsoft.BotBuilderSamples
 {
     public class TopLevelDialog : ComponentDialog
     {
-        // Define a "done" response for the company selection prompt.
-        private const string DoneOption = "done";
 
         // Define value names for values tracked inside the dialogs.
         private const string UserInfo = "value-userInfo";
@@ -44,7 +42,7 @@ namespace Microsoft.BotBuilderSamples
             var promptOptions = new PromptOptions { Prompt = MessageFactory.Text("Please enter your name.") };
 
             // Ask the user to enter their name.
-            return await stepContext.PromptAsync(nameof(TextPrompt), promptOptions, cancellationToken);
+            return await stepContext.PromptAsync(nameof(TextPrompt), promptOptions, cancellationToken).ConfigureAwait(false);
         }
 
         private async Task<DialogTurnResult> AgeStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
@@ -56,7 +54,7 @@ namespace Microsoft.BotBuilderSamples
             var promptOptions = new PromptOptions { Prompt = MessageFactory.Text("Please enter your age.") };
 
             // Ask the user to enter their age.
-            return await stepContext.PromptAsync(nameof(NumberPrompt<int>), promptOptions, cancellationToken);
+            return await stepContext.PromptAsync(nameof(NumberPrompt<int>), promptOptions, cancellationToken).ConfigureAwait(false);
         }
 
         private async Task<DialogTurnResult> StartSelectionStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
@@ -70,13 +68,13 @@ namespace Microsoft.BotBuilderSamples
                 // If they are too young, skip the review selection dialog, and pass an empty list to the next step.
                 await stepContext.Context.SendActivityAsync(
                     MessageFactory.Text("You must be 25 or older to participate."),
-                    cancellationToken);
-                return await stepContext.NextAsync(new List<string>(), cancellationToken);
+                    cancellationToken).ConfigureAwait(false);
+                return await stepContext.NextAsync(new List<string>(), cancellationToken).ConfigureAwait(false);
             }
             else
             {
                 // Otherwise, start the review selection dialog.
-                return await stepContext.BeginDialogAsync(nameof(ReviewSelectionDialog), null, cancellationToken);
+                return await stepContext.BeginDialogAsync(nameof(ReviewSelectionDialog), null, cancellationToken).ConfigureAwait(false);
             }
         }
 
@@ -84,15 +82,16 @@ namespace Microsoft.BotBuilderSamples
         {
             // Set the user's company selection to what they entered in the review-selection dialog.
             var userProfile = (UserProfile)stepContext.Values[UserInfo];
-            userProfile.CompaniesToReview = stepContext.Result as List<string> ?? new List<string>();
+            userProfile.CompaniesToReview.Clear();
+            userProfile.CompaniesToReview.AddRange(stepContext.Result as List<string> ?? new List<string>());
 
             // Thank them for participating.
             await stepContext.Context.SendActivityAsync(
                 MessageFactory.Text($"Thanks for participating, {((UserProfile)stepContext.Values[UserInfo]).Name}."),
-                cancellationToken);
+                cancellationToken).ConfigureAwait(false);
 
             // Exit the dialog, returning the collected user information.
-            return await stepContext.EndDialogAsync(stepContext.Values[UserInfo], cancellationToken);
+            return await stepContext.EndDialogAsync(stepContext.Values[UserInfo], cancellationToken).ConfigureAwait(false);
         }
     }
 }

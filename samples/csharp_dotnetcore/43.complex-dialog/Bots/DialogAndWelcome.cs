@@ -32,7 +32,7 @@ namespace Microsoft.BotBuilderSamples
                     var reply = MessageFactory.Text($"Welcome to Complex Dialog Bot {member.Name}. " +
                         "This bot provides a complex conversation, with multiple dialogs. " +
                         "Type anything to get started.");
-                    await turnContext.SendActivityAsync(reply, cancellationToken);
+                    await turnContext.SendActivityAsync(reply, cancellationToken).ConfigureAwait(false);
                 }
             }
         }

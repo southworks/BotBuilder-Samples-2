@@ -30,7 +30,7 @@ namespace Microsoft.BotBuilderSamples
 
         private async Task<DialogTurnResult> InitialStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
-            return await stepContext.BeginDialogAsync(nameof(TopLevelDialog), null, cancellationToken);
+            return await stepContext.BeginDialogAsync(nameof(TopLevelDialog), null, cancellationToken).ConfigureAwait(false);
         }
 
         private async Task<DialogTurnResult> FinalStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
@@ -41,12 +41,12 @@ namespace Microsoft.BotBuilderSamples
                 + (userInfo.CompaniesToReview.Count is 0 ? "no companies" : string.Join(" and ", userInfo.CompaniesToReview))
                 + ".";
 
-            await stepContext.Context.SendActivityAsync(status);
+            await stepContext.Context.SendActivityAsync(status).ConfigureAwait(false);
 
             var accessor = _userState.CreateProperty<UserProfile>(nameof(UserProfile));
-            await accessor.SetAsync(stepContext.Context, userInfo, cancellationToken);
+            await accessor.SetAsync(stepContext.Context, userInfo, cancellationToken).ConfigureAwait(false);
 
-            return await stepContext.EndDialogAsync(null, cancellationToken);
+            return await stepContext.EndDialogAsync(null, cancellationToken).ConfigureAwait(false);
         }
     }
 }

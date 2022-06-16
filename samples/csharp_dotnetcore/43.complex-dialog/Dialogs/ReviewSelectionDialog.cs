@@ -75,7 +75,7 @@ namespace Microsoft.BotBuilderSamples
             };
 
             // Prompt the user for a choice.
-            return await stepContext.PromptAsync(nameof(ChoicePrompt), promptOptions, cancellationToken);
+            return await stepContext.PromptAsync(nameof(ChoicePrompt), promptOptions, cancellationToken).ConfigureAwait(false);
         }
 
         private async Task<DialogTurnResult> LoopStepAsync(
@@ -96,12 +96,12 @@ namespace Microsoft.BotBuilderSamples
             if (done || list.Count >= 2)
             {
                 // If they're done, exit and return their list.
-                return await stepContext.EndDialogAsync(list, cancellationToken);
+                return await stepContext.EndDialogAsync(list, cancellationToken).ConfigureAwait(false);
             }
             else
             {
                 // Otherwise, repeat this dialog, passing in the list from this iteration.
-                return await stepContext.ReplaceDialogAsync(nameof(ReviewSelectionDialog), list, cancellationToken);
+                return await stepContext.ReplaceDialogAsync(nameof(ReviewSelectionDialog), list, cancellationToken).ConfigureAwait(false);
             }
         }
     }

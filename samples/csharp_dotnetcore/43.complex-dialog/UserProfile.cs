@@ -13,6 +13,6 @@ namespace Microsoft.BotBuilderSamples
         public int Age { get; set; }
 
         // The list of companies the user wants to review.
-        public List<string> CompaniesToReview { get; set; } = new List<string>();
+        public List<string> CompaniesToReview { get; } = new List<string>();
     }
 }
