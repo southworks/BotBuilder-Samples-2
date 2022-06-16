@@ -30,7 +30,7 @@ namespace Microsoft.BotBuilderSamples.Bots
         protected override async Task OnMessageActivityAsync(ITurnContext<IMessageActivity> turnContext, CancellationToken cancellationToken)
         {
             var reply = MessageFactory.Attachment(new[] { GetTaskModuleHeroCardOptions(), GetTaskModuleAdaptiveCardOptions() });
-            await turnContext.SendActivityAsync(reply, cancellationToken);
+            await turnContext.SendActivityAsync(reply, cancellationToken).ConfigureAwait(false);
         }
 
         protected override Task<TaskModuleResponse> OnTeamsTaskModuleFetchAsync(ITurnContext<IInvokeActivity> turnContext, TaskModuleRequest taskModuleRequest, CancellationToken cancellationToken)
@@ -63,7 +63,7 @@ namespace Microsoft.BotBuilderSamples.Bots
         protected override async Task<TaskModuleResponse> OnTeamsTaskModuleSubmitAsync(ITurnContext<IInvokeActivity> turnContext, TaskModuleRequest taskModuleRequest, CancellationToken cancellationToken)
         {
             var reply = MessageFactory.Text("OnTeamsTaskModuleSubmitAsync Value: " + JsonConvert.SerializeObject(taskModuleRequest));
-            await turnContext.SendActivityAsync(reply, cancellationToken);
+            await turnContext.SendActivityAsync(reply, cancellationToken).ConfigureAwait(false);
 
             return TaskModuleResponseFactory.CreateResponse("Thanks!");
         }
