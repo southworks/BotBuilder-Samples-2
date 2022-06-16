@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Bot.Builder;
@@ -30,16 +31,16 @@ namespace Microsoft.BotBuilderSamples
         protected override async Task OnMessageActivityAsync(ITurnContext<IMessageActivity> turnContext, CancellationToken cancellationToken)
         {
             var conversationStateAccessors = _conversationState.CreateProperty<ConversationFlow>(nameof(ConversationFlow));
-            var flow = await conversationStateAccessors.GetAsync(turnContext, () => new ConversationFlow(), cancellationToken);
+            var flow = await conversationStateAccessors.GetAsync(turnContext, () => new ConversationFlow(), cancellationToken).ConfigureAwait(false);
 
             var userStateAccessors = _userState.CreateProperty<UserProfile>(nameof(UserProfile));
-            var profile = await userStateAccessors.GetAsync(turnContext, () => new UserProfile(), cancellationToken);
+            var profile = await userStateAccessors.GetAsync(turnContext, () => new UserProfile(), cancellationToken).ConfigureAwait(false);
 
-            await FillOutUserProfileAsync(flow, profile, turnContext, cancellationToken);
+            await FillOutUserProfileAsync(flow, profile, turnContext, cancellationToken).ConfigureAwait(false);
 
             // Save changes.
-            await _conversationState.SaveChangesAsync(turnContext, false, cancellationToken);
-            await _userState.SaveChangesAsync(turnContext, false, cancellationToken);
+            await _conversationState.SaveChangesAsync(turnContext, false, cancellationToken).ConfigureAwait(false);
+            await _userState.SaveChangesAsync(turnContext, false, cancellationToken).ConfigureAwait(false);
         }
 
         private static async Task FillOutUserProfileAsync(ConversationFlow flow, UserProfile profile, ITurnContext turnContext, CancellationToken cancellationToken)
@@ -50,21 +51,21 @@ namespace Microsoft.BotBuilderSamples
             switch (flow.LastQuestionAsked)
             {
                 case ConversationFlow.Question.None:
-                    await turnContext.SendActivityAsync("Let's get started. What is your name?", null, null, cancellationToken);
+                    await turnContext.SendActivityAsync("Let's get started. What is your name?", null, null, cancellationToken).ConfigureAwait(false);
                     flow.LastQuestionAsked = ConversationFlow.Question.Name;
                     break;
                 case ConversationFlow.Question.Name:
                     if (ValidateName(input, out var name, out message))
                     {
                         profile.Name = name;
-                        await turnContext.SendActivityAsync($"Hi {profile.Name}.", null, null, cancellationToken);
-                        await turnContext.SendActivityAsync("How old are you?", null, null, cancellationToken);
+                        await turnContext.SendActivityAsync($"Hi {profile.Name}.", null, null, cancellationToken).ConfigureAwait(false);
+                        await turnContext.SendActivityAsync("How old are you?", null, null, cancellationToken).ConfigureAwait(false);
                         flow.LastQuestionAsked = ConversationFlow.Question.Age;
                         break;
                     }
                     else
                     {
-                        await turnContext.SendActivityAsync(message ?? "I'm sorry, I didn't understand that.", null, null, cancellationToken);
+                        await turnContext.SendActivityAsync(message ?? "I'm sorry, I didn't understand that.", null, null, cancellationToken).ConfigureAwait(false);
                         break;
                     }
 
@@ -72,14 +73,14 @@ namespace Microsoft.BotBuilderSamples
                     if (ValidateAge(input, out var age, out message))
                     {
                         profile.Age = age;
-                        await turnContext.SendActivityAsync($"I have your age as {profile.Age}.", null, null, cancellationToken);
-                        await turnContext.SendActivityAsync("When is your flight?", null, null, cancellationToken);
+                        await turnContext.SendActivityAsync($"I have your age as {profile.Age}.", null, null, cancellationToken).ConfigureAwait(false);
+                        await turnContext.SendActivityAsync("When is your flight?", null, null, cancellationToken).ConfigureAwait(false);
                         flow.LastQuestionAsked = ConversationFlow.Question.Date;
                         break;
                     }
                     else
                     {
-                        await turnContext.SendActivityAsync(message ?? "I'm sorry, I didn't understand that.", null, null, cancellationToken);
+                        await turnContext.SendActivityAsync(message ?? "I'm sorry, I didn't understand that.", null, null, cancellationToken).ConfigureAwait(false);
                         break;
                     }
 
@@ -87,16 +88,16 @@ namespace Microsoft.BotBuilderSamples
                     if (ValidateDate(input, out var date, out message))
                     {
                         profile.Date = date;
-                        await turnContext.SendActivityAsync($"Your cab ride to the airport is scheduled for {profile.Date}.");
-                        await turnContext.SendActivityAsync($"Thanks for completing the booking {profile.Name}.");
-                        await turnContext.SendActivityAsync($"Type anything to run the bot again.");
+                        await turnContext.SendActivityAsync($"Your cab ride to the airport is scheduled for {profile.Date}.").ConfigureAwait(false);
+                        await turnContext.SendActivityAsync($"Thanks for completing the booking {profile.Name}.").ConfigureAwait(false);
+                        await turnContext.SendActivityAsync($"Type anything to run the bot again.").ConfigureAwait(false);
                         flow.LastQuestionAsked = ConversationFlow.Question.None;
                         profile = new UserProfile();
                         break;
                     }
                     else
                     {
-                        await turnContext.SendActivityAsync(message ?? "I'm sorry, I didn't understand that.", null, null, cancellationToken);
+                        await turnContext.SendActivityAsync(message ?? "I'm sorry, I didn't understand that.", null, null, cancellationToken).ConfigureAwait(false);
                         break;
                     }
             }
@@ -137,7 +138,7 @@ namespace Microsoft.BotBuilderSamples
                     // The result resolution is a dictionary, where the "value" entry contains the processed string.
                     if (result.Resolution.TryGetValue("value", out var value))
                     {
-                        age = Convert.ToInt32(value);
+                        age = Convert.ToInt32(value, CultureInfo.CurrentCulture);
                         if (age >= 18 && age <= 120)
                         {
                             return true;
