@@ -21,13 +21,13 @@ namespace Microsoft.BotBuilderSamples.Dialogs
 
         protected override async Task<DialogTurnResult> OnContinueDialogAsync(DialogContext innerDc, CancellationToken cancellationToken = default)
         {
-            var result = await InterruptAsync(innerDc, cancellationToken);
+            var result = await InterruptAsync(innerDc, cancellationToken).ConfigureAwait(false);
             if (result != null)
             {
                 return result;
             }
 
-            return await base.OnContinueDialogAsync(innerDc, cancellationToken);
+            return await base.OnContinueDialogAsync(innerDc, cancellationToken).ConfigureAwait(false);
         }
 
         private async Task<DialogTurnResult> InterruptAsync(DialogContext innerDc, CancellationToken cancellationToken)
@@ -41,14 +41,14 @@ namespace Microsoft.BotBuilderSamples.Dialogs
                     case "help":
                     case "?":
                         var helpMessage = MessageFactory.Text(HelpMsgText, HelpMsgText, InputHints.ExpectingInput);
-                        await innerDc.Context.SendActivityAsync(helpMessage, cancellationToken);
+                        await innerDc.Context.SendActivityAsync(helpMessage, cancellationToken).ConfigureAwait(false);
                         return new DialogTurnResult(DialogTurnStatus.Waiting);
 
                     case "cancel":
                     case "quit":
                         var cancelMessage = MessageFactory.Text(CancelMsgText, CancelMsgText, InputHints.IgnoringInput);
-                        await innerDc.Context.SendActivityAsync(cancelMessage, cancellationToken);
-                        return await innerDc.CancelAllDialogsAsync(cancellationToken);
+                        await innerDc.Context.SendActivityAsync(cancelMessage, cancellationToken).ConfigureAwait(false);
+                        return await innerDc.CancelAllDialogsAsync(cancellationToken).ConfigureAwait(false);
                 }
             }
 

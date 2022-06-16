@@ -31,8 +31,8 @@ namespace Microsoft.BotBuilderSamples.Bots
                 {
                     var welcomeCard = CreateAdaptiveCardAttachment();
                     var response = MessageFactory.Attachment(welcomeCard, ssml: "Welcome to Bot Framework!");
-                    await turnContext.SendActivityAsync(response, cancellationToken);
-                    await Dialog.RunAsync(turnContext, ConversationState.CreateProperty<DialogState>("DialogState"), cancellationToken);
+                    await turnContext.SendActivityAsync(response, cancellationToken).ConfigureAwait(false);
+                    await Dialog.RunAsync(turnContext, ConversationState.CreateProperty<DialogState>("DialogState"), cancellationToken).ConfigureAwait(false);
                 }
             }
         }
