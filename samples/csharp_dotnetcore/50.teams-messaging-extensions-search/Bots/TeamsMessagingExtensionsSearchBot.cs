@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -19,7 +20,7 @@ namespace Microsoft.BotBuilderSamples.Bots
 {
      public class TeamsMessagingExtensionsSearchBot : TeamsActivityHandler
     {
-        public readonly string _baseUrl;
+        private readonly string _baseUrl;
         public TeamsMessagingExtensionsSearchBot(IConfiguration configuration):base()
         {
             this._baseUrl = configuration["BaseUrl"];
@@ -44,7 +45,7 @@ namespace Microsoft.BotBuilderSamples.Bots
                     return resultGrid;
             }
 
-            var packages = await FindPackages(text);
+            var packages = await FindPackages(text).ConfigureAwait(false);
 
             // We take every row of the results and wrap them in cards wrapped in MessagingExtensionAttachment objects.
             // The Preview is optional, if it includes a Tap, that will trigger the OnTeamsMessagingExtensionSelectItemAsync event back on this bot.
@@ -121,7 +122,8 @@ namespace Microsoft.BotBuilderSamples.Bots
         // Generate a set of substrings to illustrate the idea of a set of results coming back from a query. 
         private async Task<IEnumerable<(string, string, string, string, string)>> FindPackages(string text)
         {
-            var obj = JObject.Parse(await (new HttpClient()).GetStringAsync($"https://azuresearch-usnc.nuget.org/query?q=id:{text}&prerelease=true"));
+            using var httpClient = new HttpClient();
+            var obj = JObject.Parse(await httpClient.GetStringAsync(new Uri($"https://azuresearch-usnc.nuget.org/query?q=id:{text}&prerelease=true")).ConfigureAwait(false));
             return obj["data"].Select(item => (item["id"].ToString(), item["version"].ToString(), item["description"].ToString(), item["projectUrl"]?.ToString(), item["iconUrl"]?.ToString()));
         }
 
