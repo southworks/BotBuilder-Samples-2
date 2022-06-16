@@ -21,7 +21,7 @@ namespace Microsoft.BotBuilderSamples.Bots
 {
     public class TeamsMessagingExtensionsActionBot : TeamsActivityHandler
     {
-        public readonly string baseUrl;
+        private readonly string baseUrl;
 
         public TeamsMessagingExtensionsActionBot(IConfiguration configuration) : base()
         {
@@ -217,7 +217,7 @@ namespace Microsoft.BotBuilderSamples.Bots
                     try
                     {
                         // Check if your app is installed by fetching member information.
-                        var member = await TeamsInfo.GetMemberAsync(turnContext, turnContext.Activity.From.Id, cancellationToken);
+                        var member = await TeamsInfo.GetMemberAsync(turnContext, turnContext.Activity.From.Id, cancellationToken).ConfigureAwait(false);
                         memberName = member.Name;
                     }
                     catch (ErrorResponseException ex)

@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace Microsoft.BotBuilderSamples.Helpers
 {
-    public class CardHelper
+    public static class CardHelper
     {
         public static List<MessagingExtensionAttachment> CreateAdaptiveCardAttachment(MessagingExtensionAction action, CardResponse createCardResponse)
         {
