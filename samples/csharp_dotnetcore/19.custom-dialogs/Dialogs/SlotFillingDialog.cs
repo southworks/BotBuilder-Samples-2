@@ -53,11 +53,11 @@ namespace Microsoft.BotBuilderSamples
             // Don't do anything for non-message activities.
             if (dialogContext.Context.Activity.Type != ActivityTypes.Message)
             {
-                return await dialogContext.EndDialogAsync(new Dictionary<string, object>(), cancellationToken);
+                return await dialogContext.EndDialogAsync(new Dictionary<string, object>(), cancellationToken).ConfigureAwait(false);
             }
 
             // Run prompt
-            return await RunPromptAsync(dialogContext, cancellationToken);
+            return await RunPromptAsync(dialogContext, cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -80,7 +80,7 @@ namespace Microsoft.BotBuilderSamples
             }
 
             // Run next step with the message text as the result.
-            return await RunPromptAsync(dialogContext, cancellationToken);
+            return await RunPromptAsync(dialogContext, cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -104,7 +104,7 @@ namespace Microsoft.BotBuilderSamples
             values[slotName] = result;
 
             // Run prompt.
-            return await RunPromptAsync(dialogContext, cancellationToken);
+            return await RunPromptAsync(dialogContext, cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>

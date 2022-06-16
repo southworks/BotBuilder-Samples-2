@@ -86,7 +86,7 @@ namespace Microsoft.BotBuilderSamples
         private async Task<DialogTurnResult> StartDialogAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
             // Start the child dialog. This will run the top slot dialog than will complete when all the properties are gathered.
-            return await stepContext.BeginDialogAsync("slot-dialog", null, cancellationToken);
+            return await stepContext.BeginDialogAsync("slot-dialog", null, cancellationToken).ConfigureAwait(false);
         }
 
         private async Task<DialogTurnResult> ProcessResultsAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
@@ -99,7 +99,7 @@ namespace Microsoft.BotBuilderSamples
                 var address = (IDictionary<string, object>)result["address"];
 
                 // Now the waterfall is complete, save the data we have gathered into UserState. 
-                var obj = await _userStateAccessor.GetAsync(stepContext.Context, () => new JObject(), cancellationToken);
+                var obj = await _userStateAccessor.GetAsync(stepContext.Context, () => new JObject(), cancellationToken).ConfigureAwait(false);
                 obj["data"] = new JObject
                 {
                     { "fullname",  $"{fullname["first"]} {fullname["last"]}" },
@@ -107,13 +107,13 @@ namespace Microsoft.BotBuilderSamples
                     { "address", $"{address["street"]}, {address["city"]}, {address["zip"]}" },
                 };
 
-                await stepContext.Context.SendActivityAsync(MessageFactory.Text(obj["data"]["fullname"].Value<string>()), cancellationToken);
-                await stepContext.Context.SendActivityAsync(MessageFactory.Text(obj["data"]["shoesize"].Value<string>()), cancellationToken);
-                await stepContext.Context.SendActivityAsync(MessageFactory.Text(obj["data"]["address"].Value<string>()), cancellationToken);
+                await stepContext.Context.SendActivityAsync(MessageFactory.Text(obj["data"]["fullname"].Value<string>()), cancellationToken).ConfigureAwait(false);
+                await stepContext.Context.SendActivityAsync(MessageFactory.Text(obj["data"]["shoesize"].Value<string>()), cancellationToken).ConfigureAwait(false);
+                await stepContext.Context.SendActivityAsync(MessageFactory.Text(obj["data"]["address"].Value<string>()), cancellationToken).ConfigureAwait(false);
             }
 
             // Remember to call EndAsync to indicate to the runtime that this is the end of our waterfall.
-            return await stepContext.EndDialogAsync(null, cancellationToken);
+            return await stepContext.EndDialogAsync(null, cancellationToken).ConfigureAwait(false);
         }
     }
 }
