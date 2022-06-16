@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Bot.Builder;
@@ -52,19 +53,19 @@ namespace Microsoft.BotBuilderSamples.Dialogs
             var hostname = configuration["LanguageEndpointHostName"];
             if (string.IsNullOrEmpty(hostname))
             {
-                throw new ArgumentException(string.Format(missingConfigError, "LanguageEndpointHostName"));
+                throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, missingConfigError, "LanguageEndpointHostName"));
             }
 
             var endpointKey = configuration["LanguageEndpointKey"];
             if (string.IsNullOrEmpty(endpointKey))
             {
-                throw new ArgumentException(string.Format(missingConfigError, "LanguageEndpointKey"));
+                throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, missingConfigError, "LanguageEndpointKey"));
             }
 
             var knowledgeBaseId = configuration["ProjectName"];
             if (string.IsNullOrEmpty(knowledgeBaseId))
             {
-                throw new ArgumentException(string.Format(missingConfigError, "ProjectName"));
+                throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, missingConfigError, "ProjectName"));
             }
 
             var enablePreciseAnswer = bool.Parse(configuration["EnablePreciseAnswer"]);
@@ -92,7 +93,7 @@ namespace Microsoft.BotBuilderSamples.Dialogs
 
         private async Task<DialogTurnResult> InitialStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
-            return await stepContext.BeginDialogAsync(nameof(QnAMakerDialog), null, cancellationToken);
+            return await stepContext.BeginDialogAsync(nameof(QnAMakerDialog), null, cancellationToken).ConfigureAwait(false);
         }
     }
 }
