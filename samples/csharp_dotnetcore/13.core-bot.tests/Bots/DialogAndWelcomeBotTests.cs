@@ -41,7 +41,7 @@ namespace CoreBot.Tests.Bots
 
             // Act
             // Send the conversation update activity to the bot.
-            await testAdapter.ProcessActivityAsync(conversationUpdateActivity, sut.OnTurnAsync, CancellationToken.None);
+            await testAdapter.ProcessActivityAsync(conversationUpdateActivity, sut.OnTurnAsync, CancellationToken.None).ConfigureAwait(false);
 
             // Assert we got the welcome card
             var reply = (IMessageActivity)testAdapter.GetNextReply();

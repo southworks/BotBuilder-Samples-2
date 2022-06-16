@@ -40,8 +40,8 @@ namespace CoreBot.Tests.Dialogs
             Output.WriteLine($"Test Case: {bookingTestData.Name}");
             for (var i = 0; i < bookingTestData.UtterancesAndReplies.GetLength(0); i++)
             {
-                var reply = await testClient.SendActivityAsync<IMessageActivity>(bookingTestData.UtterancesAndReplies[i, 0]);
-                Assert.Equal(bookingTestData.UtterancesAndReplies[i, 1], reply?.Text);
+                var reply = await testClient.SendActivityAsync<IMessageActivity>(bookingTestData.UtterancesAndReplies[i][0]).ConfigureAwait(false);
+                Assert.Equal(bookingTestData.UtterancesAndReplies[i][1], reply?.Text);
             }
 
             var bookingResults = (BookingDetails)testClient.DialogTurnResult.Result;
@@ -63,8 +63,8 @@ namespace CoreBot.Tests.Dialogs
             Output.WriteLine($"Test Case: {bookingTestData.Name}");
             for (var i = 0; i < bookingTestData.UtterancesAndReplies.GetLength(0); i++)
             {
-                var reply = await testClient.SendActivityAsync<IMessageActivity>(bookingTestData.UtterancesAndReplies[i, 0]);
-                Assert.Equal(bookingTestData.UtterancesAndReplies[i, 1], reply.Text);
+                var reply = await testClient.SendActivityAsync<IMessageActivity>(bookingTestData.UtterancesAndReplies[i][0]).ConfigureAwait(false);
+                Assert.Equal(bookingTestData.UtterancesAndReplies[i][1], reply.Text);
             }
 
             Assert.Equal(DialogTurnStatus.Complete, testClient.DialogTurnResult.Status);

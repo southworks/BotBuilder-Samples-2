@@ -35,8 +35,8 @@ namespace CoreBot.Tests.Dialogs
             Output.WriteLine($"\r\nDialog Input: {testCaseData.InitialData}");
             for (var i = 0; i < testCaseData.UtterancesAndReplies.GetLength(0); i++)
             {
-                var reply = await testClient.SendActivityAsync<IMessageActivity>(testCaseData.UtterancesAndReplies[i, 0]);
-                Assert.Equal(testCaseData.UtterancesAndReplies[i, 1], reply?.Text);
+                var reply = await testClient.SendActivityAsync<IMessageActivity>(testCaseData.UtterancesAndReplies[i][0]).ConfigureAwait(false);
+                Assert.Equal(testCaseData.UtterancesAndReplies[i][1], reply?.Text);
             }
 
             Output.WriteLine($"\r\nDialog result: {testClient.DialogTurnResult.Result}");

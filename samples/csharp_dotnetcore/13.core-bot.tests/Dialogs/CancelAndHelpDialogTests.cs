@@ -36,11 +36,11 @@ namespace CoreBot.Tests.Dialogs
             var testClient = new DialogTestClient(Channels.Test, sut, middlewares: _middlewares);
 
             // Execute the test case
-            var reply = await testClient.SendActivityAsync<IMessageActivity>("Hi");
+            var reply = await testClient.SendActivityAsync<IMessageActivity>("Hi").ConfigureAwait(false);
             Assert.Equal("Hi there", reply.Text);
             Assert.Equal(DialogTurnStatus.Waiting, testClient.DialogTurnResult.Status);
 
-            reply = await testClient.SendActivityAsync<IMessageActivity>(cancelUtterance);
+            reply = await testClient.SendActivityAsync<IMessageActivity>(cancelUtterance).ConfigureAwait(false);
             Assert.Equal("Cancelling...", reply.Text);
             Assert.Equal(DialogTurnStatus.Complete, testClient.DialogTurnResult.Status);
         }
@@ -54,11 +54,11 @@ namespace CoreBot.Tests.Dialogs
             var testClient = new DialogTestClient(Channels.Test, sut, middlewares: _middlewares);
 
             // Execute the test case
-            var reply = await testClient.SendActivityAsync<IMessageActivity>("Hi");
+            var reply = await testClient.SendActivityAsync<IMessageActivity>("Hi").ConfigureAwait(false);
             Assert.Equal("Hi there", reply.Text);
             Assert.Equal(DialogTurnStatus.Waiting, testClient.DialogTurnResult.Status);
 
-            reply = await testClient.SendActivityAsync<IMessageActivity>(cancelUtterance);
+            reply = await testClient.SendActivityAsync<IMessageActivity>(cancelUtterance).ConfigureAwait(false);
             Assert.Equal("Show help here", reply.Text);
             Assert.Equal(DialogTurnStatus.Waiting, testClient.DialogTurnResult.Status);
         }
@@ -83,7 +83,7 @@ namespace CoreBot.Tests.Dialogs
 
             private async Task<DialogTurnResult> PromptStep(WaterfallStepContext stepContext, CancellationToken cancellationToken)
             {
-                return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = MessageFactory.Text("Hi there") }, cancellationToken);
+                return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = MessageFactory.Text("Hi there") }, cancellationToken).ConfigureAwait(false);
             }
 
             private Task<DialogTurnResult> FinalStep(WaterfallStepContext stepContext, CancellationToken cancellationToken)

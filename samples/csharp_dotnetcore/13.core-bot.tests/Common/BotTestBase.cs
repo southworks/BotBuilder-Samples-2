@@ -69,11 +69,11 @@ namespace CoreBot.Tests.Common
 
             using (var file = File.OpenText(launchSettingsFile))
             {
-                var reader = new JsonTextReader(file);
+                using var reader = new JsonTextReader(file);
                 var fileData = JObject.Load(reader);
 
                 var variables = fileData
-                    .GetValue("profiles")
+                    .GetValue("profiles", StringComparison.Ordinal)
                     .SelectMany(profiles => profiles.Children())
                     .SelectMany(profile => profile.Children<JProperty>())
                     .Where(prop => prop.Name == "environmentVariables")

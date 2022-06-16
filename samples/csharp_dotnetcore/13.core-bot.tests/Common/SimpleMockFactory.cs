@@ -30,9 +30,9 @@ namespace CoreBot.Tests.Common
                 .Setup(x => x.BeginDialogAsync(It.IsAny<DialogContext>(), It.IsAny<object>(), It.IsAny<CancellationToken>()))
                 .Returns(async (DialogContext dialogContext, object options, CancellationToken cancellationToken) =>
                 {
-                    await dialogContext.Context.SendActivityAsync($"{mockDialogNameTypeName} mock invoked", cancellationToken: cancellationToken);
+                    await dialogContext.Context.SendActivityAsync($"{mockDialogNameTypeName} mock invoked", cancellationToken: cancellationToken).ConfigureAwait(false);
 
-                    return await dialogContext.EndDialogAsync(expectedResult, cancellationToken);
+                    return await dialogContext.EndDialogAsync(expectedResult, cancellationToken).ConfigureAwait(false);
                 });
 
             return mockDialog;

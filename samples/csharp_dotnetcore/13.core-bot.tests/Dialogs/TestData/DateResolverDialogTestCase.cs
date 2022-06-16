@@ -1,6 +1,8 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
+using System.Collections.Generic;
+
 namespace CoreBot.Tests.Dialogs.TestData
 {
     /// <summary>
@@ -12,7 +14,9 @@ namespace CoreBot.Tests.Dialogs.TestData
 
         public string InitialData { get; set; }
 
-        public string[,] UtterancesAndReplies { get; set; }
+#pragma warning disable CA1819 // Properties should not return arrays
+        public string[][] UtterancesAndReplies { get; set; }
+#pragma warning restore CA1819 // Properties should not return arrays
 
         public string ExpectedResult { get; set; }
     }

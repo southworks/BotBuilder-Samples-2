@@ -42,7 +42,7 @@ namespace CoreBot.Tests.Controllers
             };
 
             // Invoke the controller
-            await sut.PostAsync();
+            await sut.PostAsync().ConfigureAwait(false);
 
             // Assert
             mockAdapter.Verify(

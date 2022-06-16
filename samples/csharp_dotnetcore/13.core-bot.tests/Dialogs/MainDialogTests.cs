@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -58,14 +59,14 @@ namespace CoreBot.Tests.Dialogs
                 .Returns(async (DialogContext dialogContext, object options, CancellationToken cancellationToken) =>
                 {
                     dialogContext.Dialogs.Add(new TextPrompt("MockDialog"));
-                    return await dialogContext.PromptAsync("MockDialog", new PromptOptions() { Prompt = MessageFactory.Text($"{nameof(BookingDialog)} mock invoked") }, cancellationToken);
+                    return await dialogContext.PromptAsync("MockDialog", new PromptOptions() { Prompt = MessageFactory.Text($"{nameof(BookingDialog)} mock invoked") }, cancellationToken).ConfigureAwait(false);
                 });
 
             var sut = new MainDialog(mockRecognizer.Object, mockDialog.Object, _mockLogger.Object);
             var testClient = new DialogTestClient(Channels.Test, sut, middlewares: new[] { new XUnitDialogTestLogger(Output) });
 
             // Act/Assert
-            var reply = await testClient.SendActivityAsync<IMessageActivity>("hi");
+            var reply = await testClient.SendActivityAsync<IMessageActivity>("hi").ConfigureAwait(false);
             Assert.Equal("NOTE: LUIS is not configured. To enable all capabilities, add 'LuisAppId', 'LuisAPIKey' and 'LuisAPIHostName' to the appsettings.json file.", reply.Text);
 
             reply = testClient.GetNextReply<IMessageActivity>();
@@ -82,8 +83,8 @@ namespace CoreBot.Tests.Dialogs
             var testClient = new DialogTestClient(Channels.Test, sut, middlewares: new[] { new XUnitDialogTestLogger(Output) });
 
             // Act/Assert
-            var reply = await testClient.SendActivityAsync<IMessageActivity>("hi");
-            var weekLaterDate = DateTime.Now.AddDays(7).ToString("MMMM d, yyyy");
+            var reply = await testClient.SendActivityAsync<IMessageActivity>("hi").ConfigureAwait(false);
+            var weekLaterDate = DateTime.Now.AddDays(7).ToString("MMMM d, yyyy", CultureInfo.CurrentCulture);
             Assert.Equal($"What can I help you with today?\nSay something like \"Book a flight from Paris to Berlin on {weekLaterDate}\"", reply.Text);
         }
 
@@ -110,18 +111,18 @@ namespace CoreBot.Tests.Dialogs
 
             // Execute the test case
             Output.WriteLine($"Test Case: {intent}");
-            var reply = await testClient.SendActivityAsync<IMessageActivity>("hi");
-            var weekLaterDate = DateTime.Now.AddDays(7).ToString("MMMM d, yyyy");
+            var reply = await testClient.SendActivityAsync<IMessageActivity>("hi").ConfigureAwait(false);
+            var weekLaterDate = DateTime.Now.AddDays(7).ToString("MMMM d, yyyy", CultureInfo.CurrentCulture);
             Assert.Equal($"What can I help you with today?\nSay something like \"Book a flight from Paris to Berlin on {weekLaterDate}\"", reply.Text);
 
-            reply = await testClient.SendActivityAsync<IMessageActivity>(utterance);
+            reply = await testClient.SendActivityAsync<IMessageActivity>(utterance).ConfigureAwait(false);
             Assert.Equal(invokedDialogResponse, reply.Text);
 
             // The Booking dialog displays an additional confirmation message, assert that it is what we expect.
             if (!string.IsNullOrEmpty(taskConfirmationMessage))
             {
                 reply = testClient.GetNextReply<IMessageActivity>();
-                Assert.StartsWith(taskConfirmationMessage, reply.Text);
+                Assert.StartsWith(taskConfirmationMessage, reply.Text, StringComparison.Ordinal);
             }
 
             // Validate that the MainDialog starts over once the task is completed.
@@ -149,11 +150,11 @@ namespace CoreBot.Tests.Dialogs
 
             // Execute the test case
             Output.WriteLine($"Test Case: {mockLuisResult.Text}");
-            var reply = await testClient.SendActivityAsync<IMessageActivity>("hi");
-            var weekLaterDate = DateTime.Now.AddDays(7).ToString("MMMM d, yyyy");
+            var reply = await testClient.SendActivityAsync<IMessageActivity>("hi").ConfigureAwait(false);
+            var weekLaterDate = DateTime.Now.AddDays(7).ToString("MMMM d, yyyy", CultureInfo.CurrentCulture);
             Assert.Equal($"What can I help you with today?\nSay something like \"Book a flight from Paris to Berlin on {weekLaterDate}\"", reply.Text);
 
-            reply = await testClient.SendActivityAsync<IMessageActivity>(mockLuisResult.Text);
+            reply = await testClient.SendActivityAsync<IMessageActivity>(mockLuisResult.Text).ConfigureAwait(false);
             Assert.Equal(expectedMessage, reply.Text);
         }
 
