@@ -21,7 +21,7 @@ namespace Microsoft.BotBuilderSamples.Bots
         private const string QuickRepliesOption = "Quick Replies";
         private const string PostBackOption = "PostBack";
 
-        protected readonly ILogger Logger;
+        private readonly ILogger Logger;
 
         public FacebookBot(ILogger<FacebookBot> logger)
         {
@@ -35,7 +35,7 @@ namespace Microsoft.BotBuilderSamples.Bots
             // Show choices if the Facebook Payload from ChannelData is not handled
             if (!await ProcessFacebookPayload(turnContext, turnContext.Activity.ChannelData, cancellationToken))
             {
-                await ShowChoices(turnContext, cancellationToken);
+                await ShowChoices(turnContext, cancellationToken).ConfigureAwait(false);
             }
         }
 
@@ -44,7 +44,7 @@ namespace Microsoft.BotBuilderSamples.Bots
             Logger.LogInformation("Processing an Event Activity.");
 
             // Analyze Facebook payload from EventActivity.Value
-            await ProcessFacebookPayload(turnContext, turnContext.Activity.Value, cancellationToken);
+            await ProcessFacebookPayload(turnContext, turnContext.Activity.Value, cancellationToken).ConfigureAwait(false);
         }
 
         private static async Task ShowChoices(ITurnContext turnContext, CancellationToken cancellationToken)
@@ -57,7 +57,7 @@ namespace Microsoft.BotBuilderSamples.Bots
 
             // Create the prompt message
             var message = ChoiceFactory.ForChannel(turnContext.Activity.ChannelId, choices, "What Facebook feature would you like to try? Here are some quick replies to choose from!");
-            await turnContext.SendActivityAsync(message, cancellationToken);
+            await turnContext.SendActivityAsync(message, cancellationToken).ConfigureAwait(false);
         }
 
         private async Task<bool> ProcessFacebookPayload(ITurnContext turnContext, object data, CancellationToken cancellationToken)
@@ -73,28 +73,28 @@ namespace Microsoft.BotBuilderSamples.Bots
                     // PostBack
                     if (facebookPayload.PostBack != null)
                     {
-                        await OnFacebookPostBack(turnContext, facebookPayload.PostBack, cancellationToken);
+                        await OnFacebookPostBack(turnContext, facebookPayload.PostBack, cancellationToken).ConfigureAwait(false);
                         return true;
                     }
 
                     // Optin
                     else if (facebookPayload.Optin != null)
                     {
-                        await OnFacebookOptin(turnContext, facebookPayload.Optin, cancellationToken);
+                        await OnFacebookOptin(turnContext, facebookPayload.Optin, cancellationToken).ConfigureAwait(false);
                         return true;
                     }
 
                     // Quick reply
                     else if (facebookPayload.Message?.QuickReply != null)
                     {
-                        await OnFacebookQuickReply(turnContext, facebookPayload.Message.QuickReply, cancellationToken);
+                        await OnFacebookQuickReply(turnContext, facebookPayload.Message.QuickReply, cancellationToken).ConfigureAwait(false);
                         return true;
                     }
 
                     // Echo
                     else if (facebookPayload.Message?.IsEcho != null && facebookPayload.Message.IsEcho)
                     {
-                        await OnFacebookEcho(turnContext, facebookPayload.Message, cancellationToken);
+                        await OnFacebookEcho(turnContext, facebookPayload.Message, cancellationToken).ConfigureAwait(false);
                         return true;
                     }
 
@@ -105,7 +105,7 @@ namespace Microsoft.BotBuilderSamples.Bots
             {
                 if (turnContext.Activity.ChannelId != Bot.Connector.Channels.Facebook)
                 {
-                    await turnContext.SendActivityAsync("This sample is intended to be used with a Facebook bot.");
+                    await turnContext.SendActivityAsync("This sample is intended to be used with a Facebook bot.").ConfigureAwait(false);
                 }
                 else
                 {
@@ -121,7 +121,7 @@ namespace Microsoft.BotBuilderSamples.Bots
             Logger.LogInformation("Optin message received.");
 
             // TODO: Your optin event handling logic here...
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
 
         protected virtual async Task OnFacebookEcho(ITurnContext turnContext, FacebookMessage facebookMessage, CancellationToken cancellationToken)
@@ -129,7 +129,7 @@ namespace Microsoft.BotBuilderSamples.Bots
             Logger.LogInformation("Echo message received.");
 
             // TODO: Your echo event handling logic here...
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
 
         protected virtual async Task OnFacebookPostBack(ITurnContext turnContext, FacebookPostback postBack, CancellationToken cancellationToken)
@@ -140,8 +140,8 @@ namespace Microsoft.BotBuilderSamples.Bots
 
             // Answer the postback, and show choices
             var reply = MessageFactory.Text("Are you sure?");
-            await turnContext.SendActivityAsync(reply, cancellationToken);
-            await ShowChoices(turnContext, cancellationToken);
+            await turnContext.SendActivityAsync(reply, cancellationToken).ConfigureAwait(false);
+            await ShowChoices(turnContext, cancellationToken).ConfigureAwait(false);
         }
 
         protected virtual async Task OnFacebookQuickReply(ITurnContext turnContext, FacebookQuickReply quickReply, CancellationToken cancellationToken)
@@ -161,8 +161,8 @@ namespace Microsoft.BotBuilderSamples.Bots
                 case FacebookPageIdOption:
                     {
                         var reply = MessageFactory.Text($"This message comes from the following Facebook Page: {turnContext.Activity.Recipient.Id}");
-                        await turnContext.SendActivityAsync(reply, cancellationToken);
-                        await ShowChoices(turnContext, cancellationToken);
+                        await turnContext.SendActivityAsync(reply, cancellationToken).ConfigureAwait(false);
+                        await ShowChoices(turnContext, cancellationToken).ConfigureAwait(false);
 
                         break;
                     }
@@ -181,7 +181,7 @@ namespace Microsoft.BotBuilderSamples.Bots
                         };
 
                         var reply = MessageFactory.Attachment(card.ToAttachment());
-                        await turnContext.SendActivityAsync(reply, cancellationToken);
+                        await turnContext.SendActivityAsync(reply, cancellationToken).ConfigureAwait(false);
 
                         break;
                     }
@@ -190,7 +190,7 @@ namespace Microsoft.BotBuilderSamples.Bots
                 case QuickRepliesOption:
                 default:
                     {
-                        await ShowChoices(turnContext, cancellationToken);
+                        await ShowChoices(turnContext, cancellationToken).ConfigureAwait(false);
 
                         break;
                     }
