@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.Bot.Builder;
 using Microsoft.Bot.Schema;
 
-namespace Console_EchoBot
+namespace ConsoleEchoBot
 {
     public class EchoBot : IBot
     {
@@ -22,21 +22,21 @@ namespace Console_EchoBot
             if (turnContext.Activity.Type == ActivityTypes.Message && !string.IsNullOrEmpty(turnContext.Activity.Text))
             {
                 // Check to see if the user sent a simple "quit" message.
-                if (turnContext.Activity.Text.Equals("quit", StringComparison.InvariantCultureIgnoreCase))
+                if (turnContext.Activity.Text.Equals("quit", StringComparison.OrdinalIgnoreCase))
                 {
                     // Send a reply.
-                    await turnContext.SendActivityAsync($"Bye!", cancellationToken: cancellationToken);
+                    await turnContext.SendActivityAsync($"Bye!", cancellationToken: cancellationToken).ConfigureAwait(false);
                     System.Environment.Exit(0);
                 }
                 else
                 {
                     // Echo back to the user whatever they typed.
-                    await turnContext.SendActivityAsync($"You sent '{turnContext.Activity.Text}'", cancellationToken: cancellationToken);
+                    await turnContext.SendActivityAsync($"You sent '{turnContext.Activity.Text}'", cancellationToken: cancellationToken).ConfigureAwait(false);
                 }
             }
             else
             {
-                await turnContext.SendActivityAsync($"{turnContext.Activity.Type} event detected", cancellationToken: cancellationToken);
+                await turnContext.SendActivityAsync($"{turnContext.Activity.Type} event detected", cancellationToken: cancellationToken).ConfigureAwait(false);
             }
         }
     }

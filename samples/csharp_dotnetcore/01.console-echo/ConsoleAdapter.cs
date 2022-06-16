@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using Microsoft.Bot.Builder;
 using Microsoft.Bot.Schema;
 
-namespace Console_EchoBot
+namespace ConsoleEchoBot
 {
     public class ConsoleAdapter : BotAdapter
     {
@@ -99,7 +99,7 @@ namespace Console_EchoBot
                             // to create Attachments to messages, but this illustrates processing.
                             if (message.Attachments != null && message.Attachments.Any())
                             {
-                                var attachment = message.Attachments.Count == 1 ? "1 attachment" : $"{message.Attachments.Count()} attachments";
+                                var attachment = message.Attachments.Count == 1 ? "1 attachment" : $"{message.Attachments.Count} attachments";
                                 Console.WriteLine($"{message.Text} with {attachment} ");
                             }
                             else
