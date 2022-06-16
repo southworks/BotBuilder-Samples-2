@@ -25,16 +25,16 @@ namespace Microsoft.BotBuilderSamples
     {
         protected override async Task OnMembersAddedAsync(IList<ChannelAccount> membersAdded, ITurnContext<IConversationUpdateActivity> turnContext, CancellationToken cancellationToken)
         {
-            await SendWelcomeMessageAsync(turnContext, cancellationToken);
+            await SendWelcomeMessageAsync(turnContext, cancellationToken).ConfigureAwait(false);
         }
 
         protected override async Task OnMessageActivityAsync(ITurnContext<IMessageActivity> turnContext, CancellationToken cancellationToken)
         {
-            var reply = await ProcessInput(turnContext, cancellationToken);
-            await turnContext.SendActivityAsync("HI");
+            var reply = await ProcessInput(turnContext, cancellationToken).ConfigureAwait(false);
+            await turnContext.SendActivityAsync("HI").ConfigureAwait(false);
             // Respond to the user.
-            await turnContext.SendActivityAsync(reply, cancellationToken);
-            await DisplayOptionsAsync(turnContext, cancellationToken);
+            await turnContext.SendActivityAsync(reply, cancellationToken).ConfigureAwait(false);
+            await DisplayOptionsAsync(turnContext, cancellationToken).ConfigureAwait(false);
         }
   
         private static async Task DisplayOptionsAsync(ITurnContext turnContext, CancellationToken cancellationToken)
@@ -55,7 +55,7 @@ namespace Microsoft.BotBuilderSamples
             };
 
             var reply = MessageFactory.Attachment(card.ToAttachment());
-            await turnContext.SendActivityAsync(reply, cancellationToken);
+            await turnContext.SendActivityAsync(reply, cancellationToken).ConfigureAwait(false);
         }
 
         // Greet the user and give them instructions on how to interact with the bot.
@@ -69,8 +69,8 @@ namespace Microsoft.BotBuilderSamples
                         $"Welcome to AttachmentsBot {member.Name}." +
                         $" This bot will introduce you to Attachments." +
                         $" Please select an option",
-                        cancellationToken: cancellationToken);
-                    await DisplayOptionsAsync(turnContext, cancellationToken);
+                        cancellationToken: cancellationToken).ConfigureAwait(false);
+                    await DisplayOptionsAsync(turnContext, cancellationToken).ConfigureAwait(false);
                 }
             }
         }
@@ -90,7 +90,7 @@ namespace Microsoft.BotBuilderSamples
             else
             {
                 // Send at attachment to the user.
-                reply = await HandleOutgoingAttachment(turnContext, activity, cancellationToken);
+                reply = await HandleOutgoingAttachment(turnContext, activity, cancellationToken).ConfigureAwait(false);
             }
 
             return reply;
@@ -116,7 +116,7 @@ namespace Microsoft.BotBuilderSamples
                 reply = MessageFactory.Text("This is an uploaded attachment.");
 
                 // Get the uploaded attachment.
-                var uploadedAttachment = await GetUploadedAttachmentAsync(turnContext, activity.ServiceUrl, activity.Conversation.Id, cancellationToken);
+                var uploadedAttachment = await GetUploadedAttachmentAsync(turnContext, activity.ServiceUrl, activity.Conversation.Id, cancellationToken).ConfigureAwait(false);
                 reply.Attachments = new List<Attachment>() { uploadedAttachment };
             }
             else
@@ -201,7 +201,7 @@ namespace Microsoft.BotBuilderSamples
                     OriginalBase64 = File.ReadAllBytes(imagePath),
                     Type = "image/png",
                 },
-                cancellationToken);
+                cancellationToken).ConfigureAwait(false);
 
             var attachmentUri = attachments.GetAttachmentUri(response.Id);
 
