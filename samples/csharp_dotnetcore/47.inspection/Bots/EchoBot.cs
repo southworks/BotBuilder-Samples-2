@@ -22,21 +22,21 @@ namespace Microsoft.BotBuilderSamples.Bots
 
         public override async Task OnTurnAsync(ITurnContext turnContext, CancellationToken cancellationToken = default)
         {
-            await base.OnTurnAsync(turnContext, cancellationToken);
+            await base.OnTurnAsync(turnContext, cancellationToken).ConfigureAwait(false);
 
-            await _conversationState.SaveChangesAsync(turnContext, false, cancellationToken);
-            await _userState.SaveChangesAsync(turnContext, false, cancellationToken);
+            await _conversationState.SaveChangesAsync(turnContext, false, cancellationToken).ConfigureAwait(false);
+            await _userState.SaveChangesAsync(turnContext, false, cancellationToken).ConfigureAwait(false);
         }
 
         protected override async Task OnMessageActivityAsync(ITurnContext<IMessageActivity> turnContext, CancellationToken cancellationToken)
         {
             var conversationStateProp = _conversationState.CreateProperty<CustomState>("customState");
-            var convProp = await conversationStateProp.GetAsync(turnContext, () => new CustomState { Value = 0 }, cancellationToken);
+            var convProp = await conversationStateProp.GetAsync(turnContext, () => new CustomState { Value = 0 }, cancellationToken).ConfigureAwait(false);
 
             var userStateProp = _userState.CreateProperty<CustomState>("customState");
-            var userProp = await userStateProp.GetAsync(turnContext, () => new CustomState { Value = 0 }, cancellationToken);
+            var userProp = await userStateProp.GetAsync(turnContext, () => new CustomState { Value = 0 }, cancellationToken).ConfigureAwait(false);
 
-            await turnContext.SendActivityAsync(MessageFactory.Text($"Echo: {turnContext.Activity.Text} conversation state: {convProp.Value} user state: {userProp.Value}"), cancellationToken);
+            await turnContext.SendActivityAsync(MessageFactory.Text($"Echo: {turnContext.Activity.Text} conversation state: {convProp.Value} user state: {userProp.Value}"), cancellationToken).ConfigureAwait(false);
 
             convProp.Value++;
             userProp.Value++;
@@ -48,7 +48,7 @@ namespace Microsoft.BotBuilderSamples.Bots
             {
                 if (member.Id != turnContext.Activity.Recipient.Id)
                 {
-                    await turnContext.SendActivityAsync(MessageFactory.Text($"Hello and welcome!"), cancellationToken);
+                    await turnContext.SendActivityAsync(MessageFactory.Text($"Hello and welcome!"), cancellationToken).ConfigureAwait(false);
                 }
             }
         }
