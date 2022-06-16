@@ -25,15 +25,15 @@ namespace Microsoft.BotBuilderSamples.Bots
             var teamsChannelId = turnContext.Activity.TeamsGetChannelId();
             var activity = MessageFactory.Text("This will start a new thread in a channel");
 
-            var details = await TeamsInfo.SendMessageToTeamsChannelAsync(turnContext, activity, teamsChannelId, _appId, cancellationToken);
+            var details = await TeamsInfo.SendMessageToTeamsChannelAsync(turnContext, activity, teamsChannelId, _appId, cancellationToken).ConfigureAwait(false);
             await ((CloudAdapter)turnContext.Adapter).ContinueConversationAsync(
                 botAppId: _appId,
                 reference: details.Item1,
                 callback: async (t, ct) =>
                 {
-                    await t.SendActivityAsync(MessageFactory.Text("This will be the first response to the new thread"), ct);
+                    await t.SendActivityAsync(MessageFactory.Text("This will be the first response to the new thread"), ct).ConfigureAwait(false);
                 },
-                cancellationToken: cancellationToken);
+                cancellationToken: cancellationToken).ConfigureAwait(false);
         }
     }
 }
