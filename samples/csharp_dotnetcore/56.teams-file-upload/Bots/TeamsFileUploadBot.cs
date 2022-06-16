@@ -44,52 +44,52 @@ namespace Microsoft.BotBuilderSamples.Bots
 
                 string filePath = Path.Combine("Files", file.Name);
 
-                var client = _clientFactory.CreateClient();
-                var response = await client.GetAsync(fileDownload.DownloadUrl);
+                using var client = _clientFactory.CreateClient();
+                var response = await client.GetAsync(new Uri(fileDownload.DownloadUrl)).ConfigureAwait(false);
                 using (var fileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.None))
                 {
-                    await response.Content.CopyToAsync(fileStream);
+                    await response.Content.CopyToAsync(fileStream).ConfigureAwait(false);
                 }
 
                 var reply = MessageFactory.Text($"<b>{file.Name}</b> received and saved.");
                 reply.TextFormat = "xml";
-                await turnContext.SendActivityAsync(reply, cancellationToken);
+                await turnContext.SendActivityAsync(reply, cancellationToken).ConfigureAwait(false);
             }
-            else if (turnContext.Activity.Attachments?[0].ContentType.Contains("image/*") == true)
+            else if (turnContext.Activity.Attachments?[0].ContentType.Contains("image/*", StringComparison.CurrentCulture) == true)
             {
                 // Inline image se.
-                await ProcessInlineImage(turnContext, cancellationToken);
+                await ProcessInlineImage(turnContext, cancellationToken).ConfigureAwait(false);
             }
             else
             {
                 string filename = "teams-logo.png";
                 string filePath = Path.Combine("Files", filename);
                 long fileSize = new FileInfo(filePath).Length;
-                await SendFileCardAsync(turnContext, filename, fileSize, cancellationToken);
+                await SendFileCardAsync(turnContext, filename, fileSize, cancellationToken).ConfigureAwait(false);
             }
         }
 
         private async Task ProcessInlineImage(ITurnContext<IMessageActivity> turnContext, CancellationToken cancellationToken)
         {
             var attachment = turnContext.Activity.Attachments[0];
-            var client = _clientFactory.CreateClient();
+            using var client = _clientFactory.CreateClient();
 
             // Get Bot's access token to fetch inline image. 
-            var token = await new MicrosoftAppCredentials(microsoftAppId, microsoftAppPassword).GetTokenAsync();
+            var token = await new MicrosoftAppCredentials(microsoftAppId, microsoftAppPassword).GetTokenAsync().ConfigureAwait(false);
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-            var responseMessage = await client.GetAsync(attachment.ContentUrl);
+            var responseMessage = await client.GetAsync(new Uri(attachment.ContentUrl)).ConfigureAwait(false);
 
             // Save the inline image to Files directory.
             var filePath = Path.Combine("Files", "ImageFromUser.png");
             using (var fileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.None))
             {
-                await responseMessage.Content.CopyToAsync(fileStream);
+                await responseMessage.Content.CopyToAsync(fileStream).ConfigureAwait(false);
             }
 
             // Create reply with image.
             var reply = MessageFactory.Text($"Attachment of {attachment.ContentType} type and size of {responseMessage.Content.Headers.ContentLength} bytes received.");
             reply.Attachments = new List<Attachment>() { GetInlineAttachment() };
-            await turnContext.SendActivityAsync(reply, cancellationToken);
+            await turnContext.SendActivityAsync(reply, cancellationToken).ConfigureAwait(false);
         }
 
         private static Attachment GetInlineAttachment()
@@ -129,7 +129,7 @@ namespace Microsoft.BotBuilderSamples.Bots
 
             var replyActivity = turnContext.Activity.CreateReply();
             replyActivity.Attachments = new List<Attachment>() { asAttachment };
-            await turnContext.SendActivityAsync(replyActivity, cancellationToken);
+            await turnContext.SendActivityAsync(replyActivity, cancellationToken).ConfigureAwait(false);
         }
 
         protected override async Task OnTeamsFileConsentAcceptAsync(ITurnContext<IInvokeActivity> turnContext, FileConsentCardResponse fileConsentCardResponse, CancellationToken cancellationToken)
@@ -140,20 +140,20 @@ namespace Microsoft.BotBuilderSamples.Bots
 
                 string filePath = Path.Combine("Files", context["filename"].ToString());
                 long fileSize = new FileInfo(filePath).Length;
-                var client = _clientFactory.CreateClient();
+                using var client = _clientFactory.CreateClient();
                 using (var fileStream = File.OpenRead(filePath))
                 {
-                    var fileContent = new StreamContent(fileStream);
+                    using var fileContent = new StreamContent(fileStream);
                     fileContent.Headers.ContentLength = fileSize;
                     fileContent.Headers.ContentRange = new ContentRangeHeaderValue(0, fileSize - 1, fileSize);
-                    await client.PutAsync(fileConsentCardResponse.UploadInfo.UploadUrl, fileContent, cancellationToken);
+                    await client.PutAsync(new Uri(fileConsentCardResponse.UploadInfo.UploadUrl), fileContent, cancellationToken).ConfigureAwait(false);
                 }
 
-                await FileUploadCompletedAsync(turnContext, fileConsentCardResponse, cancellationToken);
+                await FileUploadCompletedAsync(turnContext, fileConsentCardResponse, cancellationToken).ConfigureAwait(false);
             }
             catch (Exception e)
             {
-                await FileUploadFailedAsync(turnContext, e.ToString(), cancellationToken);
+                await FileUploadFailedAsync(turnContext, e.ToString(), cancellationToken).ConfigureAwait(false);
             }
         }
 
@@ -163,7 +163,7 @@ namespace Microsoft.BotBuilderSamples.Bots
 
             var reply = MessageFactory.Text($"Declined. We won't upload file <b>{context["filename"]}</b>.");
             reply.TextFormat = "xml";
-            await turnContext.SendActivityAsync(reply, cancellationToken);
+            await turnContext.SendActivityAsync(reply, cancellationToken).ConfigureAwait(false);
         }
 
         private async Task FileUploadCompletedAsync(ITurnContext turnContext, FileConsentCardResponse fileConsentCardResponse, CancellationToken cancellationToken)
@@ -186,14 +186,14 @@ namespace Microsoft.BotBuilderSamples.Bots
             reply.TextFormat = "xml";
             reply.Attachments = new List<Attachment> { asAttachment };
 
-            await turnContext.SendActivityAsync(reply, cancellationToken);
+            await turnContext.SendActivityAsync(reply, cancellationToken).ConfigureAwait(false);
         }
 
         private async Task FileUploadFailedAsync(ITurnContext turnContext, string error, CancellationToken cancellationToken)
         {
             var reply = MessageFactory.Text($"<b>File upload failed.</b> Error: <pre>{error}</pre>");
             reply.TextFormat = "xml";
-            await turnContext.SendActivityAsync(reply, cancellationToken);
+            await turnContext.SendActivityAsync(reply, cancellationToken).ConfigureAwait(false);
         }
     }
 }
