@@ -14,9 +14,11 @@ namespace Microsoft.BotBuilderSamples.Bots
 {
     public class QnABot<T> : ActivityHandler where T : Microsoft.Bot.Builder.Dialogs.Dialog
     {
+#pragma warning disable CA1051 // Do not declare visible instance fields
         protected readonly BotState ConversationState;
         protected readonly Microsoft.Bot.Builder.Dialogs.Dialog Dialog;
         protected readonly BotState UserState;
+#pragma warning restore CA1051 // Do not declare visible instance fields
 
         public QnABot(ConversationState conversationState, UserState userState, T dialog)
         {
@@ -27,16 +29,16 @@ namespace Microsoft.BotBuilderSamples.Bots
 
         public override async Task OnTurnAsync(ITurnContext turnContext, CancellationToken cancellationToken = default)
         {
-            await base.OnTurnAsync(turnContext, cancellationToken);
+            await base.OnTurnAsync(turnContext, cancellationToken).ConfigureAwait(false);
 
             // Save any state changes that might have occurred during the turn.
-            await ConversationState.SaveChangesAsync(turnContext, false, cancellationToken);
-            await UserState.SaveChangesAsync(turnContext, false, cancellationToken);
+            await ConversationState.SaveChangesAsync(turnContext, false, cancellationToken).ConfigureAwait(false);
+            await UserState.SaveChangesAsync(turnContext, false, cancellationToken).ConfigureAwait(false);
         }
 
         protected override async Task OnMessageActivityAsync(ITurnContext<IMessageActivity> turnContext, CancellationToken cancellationToken) =>
             // Run the Dialog with the new message Activity.
-            await Dialog.RunAsync(turnContext, ConversationState.CreateProperty<DialogState>(nameof(DialogState)), cancellationToken);
+            await Dialog.RunAsync(turnContext, ConversationState.CreateProperty<DialogState>(nameof(DialogState)), cancellationToken).ConfigureAwait(false);
 
         protected override async Task OnMembersAddedAsync(IList<ChannelAccount> membersAdded, ITurnContext<IConversationUpdateActivity> turnContext, CancellationToken cancellationToken)
         {
@@ -44,7 +46,7 @@ namespace Microsoft.BotBuilderSamples.Bots
             {
                 if (member.Id != turnContext.Activity.Recipient.Id)
                 {
-                    await turnContext.SendActivityAsync(MessageFactory.Text($"Hello and welcome!"), cancellationToken);
+                    await turnContext.SendActivityAsync(MessageFactory.Text($"Hello and welcome!"), cancellationToken).ConfigureAwait(false);
                 }
             }
         }

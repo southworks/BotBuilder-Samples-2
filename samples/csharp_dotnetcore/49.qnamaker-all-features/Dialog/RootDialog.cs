@@ -37,7 +37,7 @@ namespace Microsoft.BotBuilderSamples.Dialog
 
         private async Task<DialogTurnResult> InitialStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
-            return await stepContext.BeginDialogAsync(nameof(QnAMakerDialog), null, cancellationToken);
+            return await stepContext.BeginDialogAsync(nameof(QnAMakerDialog), null, cancellationToken).ConfigureAwait(false);
         }
     }
 }
