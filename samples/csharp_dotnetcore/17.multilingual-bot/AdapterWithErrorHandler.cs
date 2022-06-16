@@ -35,8 +35,8 @@ namespace Microsoft.BotBuilderSamples
                 logger.LogError(exception, $"[OnTurnError] unhandled error : {exception.Message}");
 
                 // Send a message to the user
-                await SendWithoutMiddleware(turnContext, "The bot encountered an error or bug.");
-                await SendWithoutMiddleware(turnContext, "To continue to run this bot, please fix the bot source code.");
+                await SendWithoutMiddleware(turnContext, "The bot encountered an error or bug.").ConfigureAwait(false);
+                await SendWithoutMiddleware(turnContext, "To continue to run this bot, please fix the bot source code.").ConfigureAwait(false);
 
                 if (conversationState != null)
                 {
@@ -45,7 +45,7 @@ namespace Microsoft.BotBuilderSamples
                         // Delete the conversationState for the current conversation to prevent the
                         // bot from getting stuck in a error-loop caused by being in a bad state.
                         // ConversationState should be thought of as similar to "cookie-state" in a Web pages.
-                        await conversationState.DeleteAsync(turnContext);
+                        await conversationState.DeleteAsync(turnContext).ConfigureAwait(false);
                     }
                     catch (Exception e)
                     {
@@ -54,7 +54,7 @@ namespace Microsoft.BotBuilderSamples
                 }
 
                 // Send a trace activity, which will be displayed in the Bot Framework Emulator
-                await turnContext.TraceActivityAsync("OnTurnError Trace", exception.Message, "https://www.botframework.com/schemas/error", "TurnError");
+                await turnContext.TraceActivityAsync("OnTurnError Trace", exception.Message, "https://www.botframework.com/schemas/error", "TurnError").ConfigureAwait(false);
             };
         }
 
@@ -68,7 +68,7 @@ namespace Microsoft.BotBuilderSamples
             activity.ApplyConversationReference(turnContext.Activity.GetConversationReference());
 
             // Send the actual Activity through the Adapter.
-            await turnContext.Adapter.SendActivitiesAsync(turnContext, new[] { activity }, CancellationToken.None);
+            await turnContext.Adapter.SendActivitiesAsync(turnContext, new[] { activity }, CancellationToken.None).ConfigureAwait(false);
         }
     }
 }

@@ -27,7 +27,7 @@ namespace Microsoft.BotBuilderSamples.Translation
         public MicrosoftTranslator(IConfiguration configuration)
         {
             var key = configuration["TranslatorKey"];
-            _key = key ?? throw new ArgumentNullException(nameof(key));
+            _key = key ?? throw new ArgumentNullException(null, nameof(key));
 
             var region = configuration["TranslatorRegion"];
             _region = region ?? "global";
@@ -49,14 +49,14 @@ namespace Microsoft.BotBuilderSamples.Translation
                 request.Headers.Add("Ocp-Apim-Subscription-Key", _key);
                 request.Headers.Add("Ocp-Apim-Subscription-Region", _region);
 
-                var response = await _client.SendAsync(request, cancellationToken);
+                var response = await _client.SendAsync(request, cancellationToken).ConfigureAwait(false);
 
                 if (!response.IsSuccessStatusCode)
                 {
                     throw new Exception($"The call to the translation service returned HTTP status code {response.StatusCode}.");
                 }
 
-                var responseBody = await response.Content.ReadAsStringAsync();
+                var responseBody = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
                 var result = JsonConvert.DeserializeObject<TranslatorResponse[]>(responseBody);
 
                 return result?.FirstOrDefault()?.Translations?.FirstOrDefault()?.Text;

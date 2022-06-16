@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -39,14 +40,14 @@ namespace Microsoft.BotBuilderSamples
 
         protected override async Task OnMembersAddedAsync(IList<ChannelAccount> membersAdded, ITurnContext<IConversationUpdateActivity> turnContext, CancellationToken cancellationToken)
         {
-            await SendWelcomeMessageAsync(turnContext, cancellationToken);
+            await SendWelcomeMessageAsync(turnContext, cancellationToken).ConfigureAwait(false);
         }
 
         protected override async Task OnMessageActivityAsync(ITurnContext<IMessageActivity> turnContext, CancellationToken cancellationToken)
         {
             if (IsLanguageChangeRequested(turnContext.Activity.Text))
             {
-                var currentLang = turnContext.Activity.Text.ToLower();
+                var currentLang = turnContext.Activity.Text.ToLower(CultureInfo.CurrentCulture);
                 var lang = currentLang == EnglishEnglish || currentLang == SpanishEnglish ? EnglishEnglish : EnglishSpanish;
 
                 // If the user requested a language change through the suggested actions with values "es" or "en",
@@ -54,12 +55,12 @@ namespace Microsoft.BotBuilderSamples
                 // The translation middleware will catch this setting and translate both ways to the user's
                 // selected language.
                 // If Spanish was selected by the user, the reply below will actually be shown in spanish to the user.
-                await _languagePreference.SetAsync(turnContext, lang, cancellationToken);
+                await _languagePreference.SetAsync(turnContext, lang, cancellationToken).ConfigureAwait(false);
                 var reply = MessageFactory.Text($"Your current language code is: {lang}");
-                await turnContext.SendActivityAsync(reply, cancellationToken);
+                await turnContext.SendActivityAsync(reply, cancellationToken).ConfigureAwait(false);
 
                 // Save the user profile updates into the user state.
-                await _userState.SaveChangesAsync(turnContext, false, cancellationToken);
+                await _userState.SaveChangesAsync(turnContext, false, cancellationToken).ConfigureAwait(false);
             }
             else
             {
@@ -76,7 +77,7 @@ namespace Microsoft.BotBuilderSamples
                         },
                 };
 
-                await turnContext.SendActivityAsync(reply, cancellationToken);
+                await turnContext.SendActivityAsync(reply, cancellationToken).ConfigureAwait(false);
             }
         }
 
@@ -90,8 +91,8 @@ namespace Microsoft.BotBuilderSamples
                 {
                     var welcomeCard = CreateAdaptiveCardAttachment();
                     var response = MessageFactory.Attachment(welcomeCard);
-                    await turnContext.SendActivityAsync(response, cancellationToken);
-                    await turnContext.SendActivityAsync(MessageFactory.Text(WelcomeText), cancellationToken);
+                    await turnContext.SendActivityAsync(response, cancellationToken).ConfigureAwait(false);
+                    await turnContext.SendActivityAsync(MessageFactory.Text(WelcomeText), cancellationToken).ConfigureAwait(false);
                 }
             }
         }
@@ -117,7 +118,7 @@ namespace Microsoft.BotBuilderSamples
                 return false;
             }
 
-            utterance = utterance.ToLower().Trim();
+            utterance = utterance.ToLower(CultureInfo.CurrentCulture).Trim();
             return utterance == EnglishSpanish || utterance == EnglishEnglish
                 || utterance == SpanishSpanish || utterance == SpanishEnglish;
         }
