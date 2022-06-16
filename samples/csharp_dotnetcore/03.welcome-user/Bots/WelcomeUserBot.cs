@@ -61,10 +61,10 @@ namespace Microsoft.BotBuilderSamples
             {
                 if (member.Id != turnContext.Activity.Recipient.Id)
                 {
-                    await turnContext.SendActivityAsync($"Hi there - {member.Name}. {WelcomeMessage}", cancellationToken: cancellationToken);
-                    await turnContext.SendActivityAsync(InfoMessage, cancellationToken: cancellationToken);
-                    await turnContext.SendActivityAsync($"{LocaleMessage} Current locale is '{turnContext.Activity.GetLocale()}'.", cancellationToken: cancellationToken);
-                    await turnContext.SendActivityAsync(PatternMessage, cancellationToken: cancellationToken);
+                    await turnContext.SendActivityAsync($"Hi there - {member.Name}. {WelcomeMessage}", cancellationToken: cancellationToken).ConfigureAwait(false);
+                    await turnContext.SendActivityAsync(InfoMessage, cancellationToken: cancellationToken).ConfigureAwait(false);
+                    await turnContext.SendActivityAsync($"{LocaleMessage} Current locale is '{turnContext.Activity.GetLocale()}'.", cancellationToken: cancellationToken).ConfigureAwait(false);
+                    await turnContext.SendActivityAsync(PatternMessage, cancellationToken: cancellationToken).ConfigureAwait(false);
                 }
             }
         }
@@ -72,7 +72,7 @@ namespace Microsoft.BotBuilderSamples
         protected override async Task OnMessageActivityAsync(ITurnContext<IMessageActivity> turnContext, CancellationToken cancellationToken)
         {
             var welcomeUserStateAccessor = _userState.CreateProperty<WelcomeUserState>(nameof(WelcomeUserState));
-            var didBotWelcomeUser = await welcomeUserStateAccessor.GetAsync(turnContext, () => new WelcomeUserState(), cancellationToken);
+            var didBotWelcomeUser = await welcomeUserStateAccessor.GetAsync(turnContext, () => new WelcomeUserState(), cancellationToken).ConfigureAwait(false);
 
             if (didBotWelcomeUser.DidBotWelcomeUser == false)
             {
@@ -81,8 +81,8 @@ namespace Microsoft.BotBuilderSamples
                 // the channel should sends the user name in the 'From' object
                 var userName = turnContext.Activity.From.Name;
 
-                await turnContext.SendActivityAsync("You are seeing this message because this was your first message ever to this bot.", cancellationToken: cancellationToken);
-                await turnContext.SendActivityAsync($"It is a good practice to welcome the user and provide personal greeting. For example, welcome {userName}.", cancellationToken: cancellationToken);
+                await turnContext.SendActivityAsync("You are seeing this message because this was your first message ever to this bot.", cancellationToken: cancellationToken).ConfigureAwait(false);
+                await turnContext.SendActivityAsync($"It is a good practice to welcome the user and provide personal greeting. For example, welcome {userName}.", cancellationToken: cancellationToken).ConfigureAwait(false);
             }
             else
             {
@@ -92,20 +92,20 @@ namespace Microsoft.BotBuilderSamples
                 {
                     case "hello":
                     case "hi":
-                        await turnContext.SendActivityAsync($"You said {text}.", cancellationToken: cancellationToken);
+                        await turnContext.SendActivityAsync($"You said {text}.", cancellationToken: cancellationToken).ConfigureAwait(false);
                         break;
                     case "intro":
                     case "help":
-                        await SendIntroCardAsync(turnContext, cancellationToken);
+                        await SendIntroCardAsync(turnContext, cancellationToken).ConfigureAwait(false);
                         break;
                     default:
-                        await turnContext.SendActivityAsync(WelcomeMessage, cancellationToken: cancellationToken);
+                        await turnContext.SendActivityAsync(WelcomeMessage, cancellationToken: cancellationToken).ConfigureAwait(false);
                         break;
                 }
             }
 
             // Save any state changes.
-            await _userState.SaveChangesAsync(turnContext, cancellationToken: cancellationToken);
+            await _userState.SaveChangesAsync(turnContext, cancellationToken: cancellationToken).ConfigureAwait(false);
         }
 
         private static async Task SendIntroCardAsync(ITurnContext turnContext, CancellationToken cancellationToken)
@@ -127,7 +127,7 @@ namespace Microsoft.BotBuilderSamples
             };
 
             var response = MessageFactory.Attachment(card.ToAttachment());
-            await turnContext.SendActivityAsync(response, cancellationToken);
+            await turnContext.SendActivityAsync(response, cancellationToken).ConfigureAwait(false);
         }
     }
 }
