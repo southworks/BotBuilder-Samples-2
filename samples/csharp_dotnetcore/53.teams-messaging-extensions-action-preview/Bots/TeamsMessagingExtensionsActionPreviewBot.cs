@@ -23,12 +23,12 @@ namespace Microsoft.BotBuilderSamples.Bots
                 var obj = (JObject)turnContext.Activity.Value;
                 var answer = obj["Answer"]?.ToString();
                 var choices = obj["Choices"]?.ToString();
-                await turnContext.SendActivityAsync(MessageFactory.Text($"{turnContext.Activity.From.Name} answered '{answer}' and chose '{choices}'."), cancellationToken);
+                await turnContext.SendActivityAsync(MessageFactory.Text($"{turnContext.Activity.From.Name} answered '{answer}' and chose '{choices}'."), cancellationToken).ConfigureAwait(false);
             }
             else
             {
                 // This is a regular text message.
-                await turnContext.SendActivityAsync(MessageFactory.Text($"Hello from the TeamsMessagingExtensionsActionPreviewBot."), cancellationToken);
+                await turnContext.SendActivityAsync(MessageFactory.Text($"Hello from the TeamsMessagingExtensionsActionPreviewBot."), cancellationToken).ConfigureAwait(false);
             }
         }
 
@@ -169,7 +169,7 @@ namespace Microsoft.BotBuilderSamples.Bots
             }
 
             // THIS WILL WORK IF THE BOT IS INSTALLED. (SendActivityAsync will throw if the bot is not installed.)
-            await turnContext.SendActivityAsync(message, cancellationToken);
+            await turnContext.SendActivityAsync(message, cancellationToken).ConfigureAwait(false);
 
             return null;
         }
@@ -179,7 +179,7 @@ namespace Microsoft.BotBuilderSamples.Bots
             // If the adaptive card was added to the compose window (by either the OnTeamsMessagingExtensionSubmitActionAsync or
             // OnTeamsMessagingExtensionBotMessagePreviewSendAsync handler's return values) the submit values will come in here.
             var reply = MessageFactory.Text("OnTeamsMessagingExtensionCardButtonClickedAsync Value: " + JsonConvert.SerializeObject(turnContext.Activity.Value));
-            await turnContext.SendActivityAsync(reply, cancellationToken);
+            await turnContext.SendActivityAsync(reply, cancellationToken).ConfigureAwait(false);
         }
     }
 }
