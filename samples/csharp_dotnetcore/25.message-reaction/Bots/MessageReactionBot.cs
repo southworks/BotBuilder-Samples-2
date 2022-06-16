@@ -20,7 +20,7 @@ namespace Microsoft.BotBuilderSamples.Bots
 
         protected override async Task OnMessageActivityAsync(ITurnContext<IMessageActivity> turnContext, CancellationToken cancellationToken)
         {
-            await SendMessageAndLogActivityId(turnContext, $"echo: {turnContext.Activity.Text}", cancellationToken);
+            await SendMessageAndLogActivityId(turnContext, $"echo: {turnContext.Activity.Text}", cancellationToken).ConfigureAwait(false);
         }
 
         protected override async Task OnReactionsAddedAsync(IList<MessageReaction> messageReactions, ITurnContext<IMessageReactionActivity> turnContext, CancellationToken cancellationToken)
@@ -29,15 +29,15 @@ namespace Microsoft.BotBuilderSamples.Bots
             {
                 // The ReplyToId property of the inbound MessageReaction Activity will correspond to a Message Activity which
                 // had previously been sent from this bot.
-                var activity = await _log.Find(turnContext.Activity.ReplyToId);
+                var activity = await _log.Find(turnContext.Activity.ReplyToId).ConfigureAwait(false);
                 if (activity == null)
                 {
                     // If we had sent the message from the error handler we wouldn't have recorded the Activity Id and so we
                     // shouldn't expect to see it in the log.
-                    await SendMessageAndLogActivityId(turnContext, $"Activity {turnContext.Activity.ReplyToId} not found in the log.", cancellationToken);
+                    await SendMessageAndLogActivityId(turnContext, $"Activity {turnContext.Activity.ReplyToId} not found in the log.", cancellationToken).ConfigureAwait(false);
                 }
 
-                await SendMessageAndLogActivityId(turnContext, $"You added '{reaction.Type}' regarding '{activity.Text}'", cancellationToken);
+                await SendMessageAndLogActivityId(turnContext, $"You added '{reaction.Type}' regarding '{activity.Text}'", cancellationToken).ConfigureAwait(false);
             }
         }
 
@@ -47,15 +47,15 @@ namespace Microsoft.BotBuilderSamples.Bots
             {
                 // The ReplyToId property of the inbound MessageReaction Activity will correspond to a Message Activity which
                 // was previously sent from this bot.
-                var activity = await _log.Find(turnContext.Activity.ReplyToId);
+                var activity = await _log.Find(turnContext.Activity.ReplyToId).ConfigureAwait(false);
                 if (activity == null)
                 {
                     // If we had sent the message from the error handler we wouldn't have recorded the Activity Id and so we
                     // shouldn't expect to see it in the log.
-                    await SendMessageAndLogActivityId(turnContext, $"Activity {turnContext.Activity.ReplyToId} not found in the log.", cancellationToken);
+                    await SendMessageAndLogActivityId(turnContext, $"Activity {turnContext.Activity.ReplyToId} not found in the log.", cancellationToken).ConfigureAwait(false);
                 }
 
-                await SendMessageAndLogActivityId(turnContext, $"You removed '{reaction.Type}' regarding '{activity.Text}'", cancellationToken);
+                await SendMessageAndLogActivityId(turnContext, $"You removed '{reaction.Type}' regarding '{activity.Text}'", cancellationToken).ConfigureAwait(false);
             }
         }
 
@@ -63,8 +63,8 @@ namespace Microsoft.BotBuilderSamples.Bots
         {
             // We need to record the Activity Id from the Activity just sent in order to understand what the reaction is a reaction too. 
             var replyActivity = MessageFactory.Text(text);
-            var resourceResponse = await turnContext.SendActivityAsync(replyActivity, cancellationToken);
-            await _log.Append(resourceResponse.Id, replyActivity);
+            var resourceResponse = await turnContext.SendActivityAsync(replyActivity, cancellationToken).ConfigureAwait(false);
+            await _log.Append(resourceResponse.Id, replyActivity).ConfigureAwait(false);
         }
     }
 }
