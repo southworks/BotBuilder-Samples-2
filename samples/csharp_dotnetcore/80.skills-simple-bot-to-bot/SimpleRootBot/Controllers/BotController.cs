@@ -27,7 +27,7 @@ namespace Microsoft.BotBuilderSamples.SimpleRootBot.Controllers
         [HttpPost]
         public async Task PostAsync()
         {
-            await _adapter.ProcessAsync(Request, Response, _bot);
+            await _adapter.ProcessAsync(Request, Response, _bot).ConfigureAwait(false);
         }
     }
 }

@@ -54,47 +54,47 @@ namespace Microsoft.BotBuilderSamples.SimpleRootBot.Bots
             if (turnContext.Activity.Type != ActivityTypes.EndOfConversation)
             {
                 // Try to get the active skill
-                var activeSkill = await _activeSkillProperty.GetAsync(turnContext, () => null, cancellationToken);
+                var activeSkill = await _activeSkillProperty.GetAsync(turnContext, () => null, cancellationToken).ConfigureAwait(false);
 
                 if (activeSkill != null)
                 {
                     // Send the activity to the skill
-                    await SendToSkill(turnContext, activeSkill, cancellationToken);
+                    await SendToSkill(turnContext, activeSkill, cancellationToken).ConfigureAwait(false);
                     return;
                 }
             }
 
-            await base.OnTurnAsync(turnContext, cancellationToken);
+            await base.OnTurnAsync(turnContext, cancellationToken).ConfigureAwait(false);
 
             // Save any state changes that might have occured during the turn.
-            await _conversationState.SaveChangesAsync(turnContext, false, cancellationToken);
+            await _conversationState.SaveChangesAsync(turnContext, false, cancellationToken).ConfigureAwait(false);
         }
 
         protected override async Task OnMessageActivityAsync(ITurnContext<IMessageActivity> turnContext, CancellationToken cancellationToken)
         {
-            if (turnContext.Activity.Text.Contains("skill"))
+            if (turnContext.Activity.Text.Contains("skill", StringComparison.Ordinal))
             {
-                await turnContext.SendActivityAsync(MessageFactory.Text("Got it, connecting you to the skill..."), cancellationToken);
+                await turnContext.SendActivityAsync(MessageFactory.Text("Got it, connecting you to the skill..."), cancellationToken).ConfigureAwait(false);
 
                 // Save active skill in state
-                await _activeSkillProperty.SetAsync(turnContext, _targetSkill, cancellationToken);
+                await _activeSkillProperty.SetAsync(turnContext, _targetSkill, cancellationToken).ConfigureAwait(false);
 
                 // Send the activity to the skill
-                await SendToSkill(turnContext, _targetSkill, cancellationToken);
+                await SendToSkill(turnContext, _targetSkill, cancellationToken).ConfigureAwait(false);
                 return;
             }
 
             // just respond
-            await turnContext.SendActivityAsync(MessageFactory.Text("Me no nothin'. Say \"skill\" and I'll patch you through"), cancellationToken);
+            await turnContext.SendActivityAsync(MessageFactory.Text("Me no nothin'. Say \"skill\" and I'll patch you through"), cancellationToken).ConfigureAwait(false);
 
             // Save conversation state
-            await _conversationState.SaveChangesAsync(turnContext, force: true, cancellationToken: cancellationToken);
+            await _conversationState.SaveChangesAsync(turnContext, force: true, cancellationToken: cancellationToken).ConfigureAwait(false);
         }
 
         protected override async Task OnEndOfConversationActivityAsync(ITurnContext<IEndOfConversationActivity> turnContext, CancellationToken cancellationToken)
         {
             // forget skill invocation
-            await _activeSkillProperty.DeleteAsync(turnContext, cancellationToken);
+            await _activeSkillProperty.DeleteAsync(turnContext, cancellationToken).ConfigureAwait(false);
 
             // Show status message, text and value returned by the skill
             var eocActivityMessage = $"Received {ActivityTypes.EndOfConversation}.\n\nCode: {turnContext.Activity.Code}";
@@ -108,13 +108,13 @@ namespace Microsoft.BotBuilderSamples.SimpleRootBot.Bots
                 eocActivityMessage += $"\n\nValue: {JsonConvert.SerializeObject((turnContext.Activity as Activity)?.Value)}";
             }
 
-            await turnContext.SendActivityAsync(MessageFactory.Text(eocActivityMessage), cancellationToken);
+            await turnContext.SendActivityAsync(MessageFactory.Text(eocActivityMessage), cancellationToken).ConfigureAwait(false);
 
             // We are back at the root
-            await turnContext.SendActivityAsync(MessageFactory.Text("Back in the root bot. Say \"skill\" and I'll patch you through"), cancellationToken);
+            await turnContext.SendActivityAsync(MessageFactory.Text("Back in the root bot. Say \"skill\" and I'll patch you through"), cancellationToken).ConfigureAwait(false);
 
             // Save conversation state
-            await _conversationState.SaveChangesAsync(turnContext, cancellationToken: cancellationToken);
+            await _conversationState.SaveChangesAsync(turnContext, cancellationToken: cancellationToken).ConfigureAwait(false);
         }
 
         protected override async Task OnMembersAddedAsync(IList<ChannelAccount> membersAdded, ITurnContext<IConversationUpdateActivity> turnContext, CancellationToken cancellationToken)
@@ -123,7 +123,7 @@ namespace Microsoft.BotBuilderSamples.SimpleRootBot.Bots
             {
                 if (member.Id != turnContext.Activity.Recipient.Id)
                 {
-                    await turnContext.SendActivityAsync(MessageFactory.Text("Hello and welcome!"), cancellationToken);
+                    await turnContext.SendActivityAsync(MessageFactory.Text("Hello and welcome!"), cancellationToken).ConfigureAwait(false);
                 }
             }
         }
@@ -132,7 +132,7 @@ namespace Microsoft.BotBuilderSamples.SimpleRootBot.Bots
         {
             // NOTE: Always SaveChanges() before calling a skill so that any activity generated by the skill
             // will have access to current accurate state.
-            await _conversationState.SaveChangesAsync(turnContext, force: true, cancellationToken: cancellationToken);
+            await _conversationState.SaveChangesAsync(turnContext, force: true, cancellationToken: cancellationToken).ConfigureAwait(false);
 
             // Create a conversationId to interact with the skill and send the activity
             var options = new SkillConversationIdFactoryOptions
@@ -142,12 +142,12 @@ namespace Microsoft.BotBuilderSamples.SimpleRootBot.Bots
                 Activity = turnContext.Activity,
                 BotFrameworkSkill = targetSkill
             };
-            var skillConversationId = await _conversationIdFactory.CreateSkillConversationIdAsync(options, cancellationToken);
+            var skillConversationId = await _conversationIdFactory.CreateSkillConversationIdAsync(options, cancellationToken).ConfigureAwait(false);
 
             using var client = _auth.CreateBotFrameworkClient();
 
             // route the activity to the skill
-            var response = await client.PostActivityAsync(_botId, targetSkill.AppId, targetSkill.SkillEndpoint, _skillsConfig.SkillHostEndpoint, skillConversationId, turnContext.Activity, cancellationToken);
+            var response = await client.PostActivityAsync(_botId, targetSkill.AppId, targetSkill.SkillEndpoint, _skillsConfig.SkillHostEndpoint, skillConversationId, turnContext.Activity, cancellationToken).ConfigureAwait(false);
 
             // Check response status
             if (!(response.Status >= 200 && response.Status <= 299))

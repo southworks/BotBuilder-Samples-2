@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Bot.Builder;
@@ -12,21 +13,21 @@ namespace Microsoft.BotBuilderSamples.EchoSkillBot.Bots
     {
         protected override async Task OnMessageActivityAsync(ITurnContext<IMessageActivity> turnContext, CancellationToken cancellationToken)
         {
-            if (turnContext.Activity.Text.Contains("end") || turnContext.Activity.Text.Contains("stop"))
+            if (turnContext.Activity.Text.Contains("end", StringComparison.Ordinal) || turnContext.Activity.Text.Contains("stop", StringComparison.Ordinal))
             {
                 // Send End of conversation at the end.
                 var messageText = $"ending conversation from the skill...";
-                await turnContext.SendActivityAsync(MessageFactory.Text(messageText, messageText, InputHints.IgnoringInput), cancellationToken);
+                await turnContext.SendActivityAsync(MessageFactory.Text(messageText, messageText, InputHints.IgnoringInput), cancellationToken).ConfigureAwait(false);
                 var endOfConversation = Activity.CreateEndOfConversationActivity();
                 endOfConversation.Code = EndOfConversationCodes.CompletedSuccessfully;
-                await turnContext.SendActivityAsync(endOfConversation, cancellationToken);
+                await turnContext.SendActivityAsync(endOfConversation, cancellationToken).ConfigureAwait(false);
             }
             else
             {
                 var messageText = $"Echo: {turnContext.Activity.Text}";
-                await turnContext.SendActivityAsync(MessageFactory.Text(messageText, messageText, InputHints.IgnoringInput), cancellationToken);
+                await turnContext.SendActivityAsync(MessageFactory.Text(messageText, messageText, InputHints.IgnoringInput), cancellationToken).ConfigureAwait(false);
                 messageText = "Say \"end\" or \"stop\" and I'll end the conversation and back to the parent.";
-                await turnContext.SendActivityAsync(MessageFactory.Text(messageText, messageText, InputHints.ExpectingInput), cancellationToken);
+                await turnContext.SendActivityAsync(MessageFactory.Text(messageText, messageText, InputHints.ExpectingInput), cancellationToken).ConfigureAwait(false);
             }
         }
 
