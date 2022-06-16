@@ -31,7 +31,7 @@ namespace Microsoft.BotBuilderSamples
         {
             var graphClient = GetAuthenticatedClient();
             var searchQuery = new QueryOption("search", search);
-            var messages = await graphClient.Me.MailFolders.Inbox.Messages.Request(new List<Option>() { searchQuery }).GetAsync();
+            var messages = await graphClient.Me.MailFolders.Inbox.Messages.Request(new List<Option>() { searchQuery }).GetAsync().ConfigureAwait(false);
             return messages.Take(10).ToArray();
         }
 
@@ -39,7 +39,7 @@ namespace Microsoft.BotBuilderSamples
         public async Task<User> GetMyProfile()
         {
             var graphClient = GetAuthenticatedClient();
-            return await graphClient.Me.Request().GetAsync();
+            return await graphClient.Me.Request().GetAsync().ConfigureAwait(false);
         }
 
         // Get an Authenticated Microsoft Graph client using the token issued to the user.

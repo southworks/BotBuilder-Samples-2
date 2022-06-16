@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Net.Http;
 using System.Threading;
@@ -35,17 +36,17 @@ namespace Microsoft.BotBuilderSamples.Bots
 
         public override async Task OnTurnAsync(ITurnContext turnContext, CancellationToken cancellationToken = default)
         {
-            await base.OnTurnAsync(turnContext, cancellationToken);
+            await base.OnTurnAsync(turnContext, cancellationToken).ConfigureAwait(false);
 
             // After the turn is complete, persist any UserState changes.
-            await _userState.SaveChangesAsync(turnContext);
+            await _userState.SaveChangesAsync(turnContext).ConfigureAwait(false);
         }
 
         protected async override Task<MessagingExtensionResponse> OnTeamsAppBasedLinkQueryAsync(ITurnContext<IInvokeActivity> turnContext, AppBasedLinkQuery query, CancellationToken cancellationToken)
         {
 
             var state = query.State; // Check the state value
-            var tokenResponse = await GetTokenResponse(turnContext, state, cancellationToken);
+            var tokenResponse = await GetTokenResponse(turnContext, state, cancellationToken).ConfigureAwait(false);
             if (tokenResponse == null || string.IsNullOrEmpty(tokenResponse.Token))
             {
                 // There is no token, so the user has not signed in yet.
@@ -75,7 +76,7 @@ namespace Microsoft.BotBuilderSamples.Bots
             }
 
             var client = new SimpleGraphClient(tokenResponse.Token);
-            var profile = await client.GetMyProfile();
+            var profile = await client.GetMyProfile().ConfigureAwait(false);
             var heroCard = new ThumbnailCard
             {
                 Title = "Thumbnail Card",
@@ -93,7 +94,7 @@ namespace Microsoft.BotBuilderSamples.Bots
         {
             // The user has requested the Messaging Extension Configuration page.  
             var escapedSettings = string.Empty;
-            var userConfigSettings = await _userConfigProperty.GetAsync(turnContext, () => string.Empty);
+            var userConfigSettings = await _userConfigProperty.GetAsync(turnContext, () => string.Empty).ConfigureAwait(false);
 
             if (!string.IsNullOrEmpty(userConfigSettings))
             {
@@ -127,7 +128,7 @@ namespace Microsoft.BotBuilderSamples.Bots
             if (state != null)
             {
                 var userConfigSettings = state.ToString();
-                await _userConfigProperty.SetAsync(turnContext, userConfigSettings, cancellationToken);
+                await _userConfigProperty.SetAsync(turnContext, userConfigSettings, cancellationToken).ConfigureAwait(false);
             }
         }
 
@@ -137,12 +138,12 @@ namespace Microsoft.BotBuilderSamples.Bots
             var text = action?.Parameters?[0]?.Name as string ?? string.Empty;
 
             var attachments = new List<MessagingExtensionAttachment>();
-            var userConfigSettings = await _userConfigProperty.GetAsync(turnContext, () => string.Empty);
-            if (userConfigSettings.ToUpper().Contains("EMAIL"))
+            var userConfigSettings = await _userConfigProperty.GetAsync(turnContext, () => string.Empty).ConfigureAwait(false);
+            if (userConfigSettings.ToUpper(CultureInfo.CurrentCulture).Contains("EMAIL", StringComparison.Ordinal))
             {
                 // When the Bot Service Auth flow completes, the action.State will contain a magic code used for verification.
                 var state = action.State; // Check the state value
-                var tokenResponse = await GetTokenResponse(turnContext, state, cancellationToken);
+                var tokenResponse = await GetTokenResponse(turnContext, state, cancellationToken).ConfigureAwait(false);
                 if (tokenResponse == null || string.IsNullOrEmpty(tokenResponse.Token))
                 {
                     // There is no token, so the user has not signed in yet.
@@ -173,7 +174,7 @@ namespace Microsoft.BotBuilderSamples.Bots
 
                 var client = new SimpleGraphClient(tokenResponse.Token);
 
-                var messages = await client.SearchMailInboxAsync(text);
+                var messages = await client.SearchMailInboxAsync(text).ConfigureAwait(false);
 
                 // Here we construct a ThumbnailCard for every attachment, and provide a HeroCard which will be
                 // displayed if the selects that item.
@@ -200,7 +201,7 @@ namespace Microsoft.BotBuilderSamples.Bots
             }
             else
             {
-                var packages = await FindPackages(text);
+                var packages = await FindPackages(text).ConfigureAwait(false);
                 // We take every row of the results and wrap them in cards wrapped in in MessagingExtensionAttachment objects.
                 // The Preview is optional, if it includes a Tap, that will trigger the OnTeamsMessagingExtensionSelectItemAsync event back on this bot.
                 attachments = packages.Select(package =>
@@ -282,10 +283,10 @@ namespace Microsoft.BotBuilderSamples.Bots
 
         protected override async Task<MessagingExtensionActionResponse> OnTeamsMessagingExtensionFetchTaskAsync(ITurnContext<IInvokeActivity> turnContext, MessagingExtensionAction action, CancellationToken cancellationToken)
         {
-            if (action.CommandId.ToUpper() == "SHOWPROFILE")
+            if (action.CommandId.ToUpper(CultureInfo.CurrentCulture) == "SHOWPROFILE")
             {
                 var state = action.State; // Check the state value
-                var tokenResponse = await GetTokenResponse(turnContext, state, cancellationToken);
+                var tokenResponse = await GetTokenResponse(turnContext, state, cancellationToken).ConfigureAwait(false);
                 if (tokenResponse == null || string.IsNullOrEmpty(tokenResponse.Token))
                 {
                     // There is no token, so the user has not signed in yet.
@@ -316,7 +317,7 @@ namespace Microsoft.BotBuilderSamples.Bots
 
                 var client = new SimpleGraphClient(tokenResponse.Token);
 
-                var profile = await client.GetMyProfile();
+                var profile = await client.GetMyProfile().ConfigureAwait(false);
 
                 return new MessagingExtensionActionResponse
                 {
@@ -333,7 +334,7 @@ namespace Microsoft.BotBuilderSamples.Bots
                 };
             }
 
-            if (action.CommandId.ToUpper() == "SIGNOUTCOMMAND")
+            if (action.CommandId.ToUpper(CultureInfo.CurrentCulture) == "SIGNOUTCOMMAND")
             {
                 var userTokenClient = turnContext.TurnState.Get<UserTokenClient>();
                 await userTokenClient.SignOutUserAsync(turnContext.Activity.From.Id, _connectionName, turnContext.Activity.ChannelId, cancellationToken).ConfigureAwait(false);
@@ -394,7 +395,8 @@ namespace Microsoft.BotBuilderSamples.Bots
         // Generate a set of substrings to illustrate the idea of a set of results coming back from a query. 
         private async Task<IEnumerable<(string, string, string, string, string)>> FindPackages(string text)
         {
-            var obj = JObject.Parse(await (new HttpClient()).GetStringAsync($"https://azuresearch-usnc.nuget.org/query?q=id:{text}&prerelease=true"));
+            using var httpClient = new HttpClient();
+            var obj = JObject.Parse(await httpClient.GetStringAsync(new Uri($"https://azuresearch-usnc.nuget.org/query?q=id:{text}&prerelease=true")).ConfigureAwait(false));
             return obj["data"].Select(item => (item["id"].ToString(), item["version"].ToString(), item["description"].ToString(), item["projectUrl"]?.ToString(), item["iconUrl"]?.ToString()));
         }
 
@@ -406,7 +408,7 @@ namespace Microsoft.BotBuilderSamples.Bots
             {
                 if (int.TryParse(state, out var parsed))
                 {
-                    magicCode = parsed.ToString();
+                    magicCode = parsed.ToString(CultureInfo.CurrentCulture);
                 }
             }
 
