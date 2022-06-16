@@ -22,24 +22,24 @@ namespace Microsoft.BotBuilderSamples
 
         protected override async Task<DialogTurnResult> OnBeginDialogAsync(DialogContext innerDc, object options, CancellationToken cancellationToken = default(CancellationToken))
         {
-            var result = await InterruptAsync(innerDc, cancellationToken);
+            var result = await InterruptAsync(innerDc, cancellationToken).ConfigureAwait(false);
             if (result != null)
             {
                 return result;
             }
 
-            return await base.OnBeginDialogAsync(innerDc, options, cancellationToken);
+            return await base.OnBeginDialogAsync(innerDc, options, cancellationToken).ConfigureAwait(false);
         }
 
         protected override async Task<DialogTurnResult> OnContinueDialogAsync(DialogContext innerDc, CancellationToken cancellationToken = default(CancellationToken))
         {
-            var result = await InterruptAsync(innerDc, cancellationToken);
+            var result = await InterruptAsync(innerDc, cancellationToken).ConfigureAwait(false);
             if (result != null)
             {
                 return result;
             }
 
-            return await base.OnContinueDialogAsync(innerDc, cancellationToken);
+            return await base.OnContinueDialogAsync(innerDc, cancellationToken).ConfigureAwait(false);
         }
 
         private async Task<DialogTurnResult> InterruptAsync(DialogContext innerDc, CancellationToken cancellationToken = default(CancellationToken))
@@ -55,8 +55,8 @@ namespace Microsoft.BotBuilderSamples
                     var userTokenClient = innerDc.Context.TurnState.Get<UserTokenClient>();
                     await userTokenClient.SignOutUserAsync(innerDc.Context.Activity.From.Id, ConnectionName, innerDc.Context.Activity.ChannelId, cancellationToken).ConfigureAwait(false);
 
-                    await innerDc.Context.SendActivityAsync(MessageFactory.Text("You have been signed out."), cancellationToken);
-                    return await innerDc.CancelAllDialogsAsync(cancellationToken);
+                    await innerDc.Context.SendActivityAsync(MessageFactory.Text("You have been signed out."), cancellationToken).ConfigureAwait(false);
+                    return await innerDc.CancelAllDialogsAsync(cancellationToken).ConfigureAwait(false);
                 }
             }
 

@@ -69,14 +69,14 @@ namespace Microsoft.BotBuilderSamples
             };
 
             // Send the message.
-            await graphClient.Me.SendMail(email, true).Request().PostAsync();
+            await graphClient.Me.SendMail(email, true).Request().PostAsync().ConfigureAwait(false);
         }
 
         // Gets mail for the user using the Microsoft Graph API
         public async Task<Message[]> GetRecentMailAsync()
         {
             var graphClient = GetAuthenticatedClient();
-            var messages = await graphClient.Me.MailFolders.Inbox.Messages.Request().GetAsync();
+            var messages = await graphClient.Me.MailFolders.Inbox.Messages.Request().GetAsync().ConfigureAwait(false);
             return messages.Take(5).ToArray();
         }
 
@@ -84,7 +84,7 @@ namespace Microsoft.BotBuilderSamples
         public async Task<User> GetMeAsync()
         {
             var graphClient = GetAuthenticatedClient();
-            var me = await graphClient.Me.Request().GetAsync();
+            var me = await graphClient.Me.Request().GetAsync().ConfigureAwait(false);
             return me;
         }
 
@@ -92,7 +92,7 @@ namespace Microsoft.BotBuilderSamples
         public async Task<User> GetManagerAsync()
         {
             var graphClient = GetAuthenticatedClient();
-            var manager = await graphClient.Me.Manager.Request().GetAsync() as User;
+            var manager = await graphClient.Me.Manager.Request().GetAsync().ConfigureAwait(false) as User;
             return manager;
         }
 
