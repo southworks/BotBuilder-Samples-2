@@ -10,7 +10,9 @@ using Microsoft.Bot.Schema;
 
 namespace Microsoft.BotBuilderSamples
 {
+#pragma warning disable CA1724 // Type names should not match namespaces (by design and we can't change this without breaking binary compat).
     public class ProactiveBot : ActivityHandler
+#pragma warning restore CA1724
     {
         // Message to send to users when the bot receives a Conversation Update event
         private const string WelcomeMessage = "Welcome to the Proactive Bot sample.  Navigate to http://localhost:3978/api/notify to proactively message everyone who has previously messaged this bot.";
@@ -43,7 +45,7 @@ namespace Microsoft.BotBuilderSamples
                 // Greet anyone that was not the target (recipient) of this message.
                 if (member.Id != turnContext.Activity.Recipient.Id)
                 {
-                    await turnContext.SendActivityAsync(MessageFactory.Text(WelcomeMessage), cancellationToken);
+                    await turnContext.SendActivityAsync(MessageFactory.Text(WelcomeMessage), cancellationToken).ConfigureAwait(false);
                 }
             }
         }
@@ -53,7 +55,7 @@ namespace Microsoft.BotBuilderSamples
             AddConversationReference(turnContext.Activity as Activity);
 
             // Echo back what the user said
-            await turnContext.SendActivityAsync(MessageFactory.Text($"You sent '{turnContext.Activity.Text}'"), cancellationToken);
+            await turnContext.SendActivityAsync(MessageFactory.Text($"You sent '{turnContext.Activity.Text}'"), cancellationToken).ConfigureAwait(false);
         }
     }
 }

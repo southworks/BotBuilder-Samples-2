@@ -33,7 +33,7 @@ namespace ProactiveBot.Controllers
         {
             foreach (var conversationReference in _conversationReferences.Values)
             {
-                await ((BotAdapter)_adapter).ContinueConversationAsync(_appId, conversationReference, BotCallback, default(CancellationToken));
+                await ((BotAdapter)_adapter).ContinueConversationAsync(_appId, conversationReference, BotCallback, default(CancellationToken)).ConfigureAwait(false);
             }
             
             // Let the caller know proactive messages have been sent
@@ -47,7 +47,7 @@ namespace ProactiveBot.Controllers
 
         private async Task BotCallback(ITurnContext turnContext, CancellationToken cancellationToken)
         {
-            await turnContext.SendActivityAsync("proactive hello");
+            await turnContext.SendActivityAsync("proactive hello").ConfigureAwait(false);
         }
     }
 }
