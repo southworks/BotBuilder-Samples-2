@@ -81,7 +81,7 @@ namespace Microsoft.BotBuilderSamples.RootBot
                 return null;
             }
 
-            return _skillsConfig.Skills.Values.FirstOrDefault(s => string.Equals(s.AppId, appId, StringComparison.InvariantCultureIgnoreCase));
+            return _skillsConfig.Skills.Values.FirstOrDefault(s => string.Equals(s.AppId, appId, StringComparison.Ordinal));
         }
 
         private async Task<bool> InterceptOAuthCardsAsync(ClaimsIdentity claimsIdentity, Activity activity, CancellationToken cancellationToken)
