@@ -10,7 +10,9 @@ using Microsoft.Bot.Schema;
 
 namespace Microsoft.BotBuilderSamples
 {
+#pragma warning disable CA1724 // Type names should not match namespaces (by design and we can't change this without breaking binary compat).
     public class ProactiveBot : ActivityHandler
+#pragma warning restore CA1724
     {
         // Message to send to users when the bot receives a Conversation Update event
         private const string WelcomeMessage = "Welcome to the Proactive Bot sample.  Navigate to http://localhost:3978/api/notify to proactively message everyone who has previously messaged this bot.";
