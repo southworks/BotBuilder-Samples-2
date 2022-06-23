@@ -25,6 +25,7 @@ namespace Console_EchoBot
                 if (turnContext.Activity.Text.Equals("quit"))
                 {
                     // Send a reply.
+
                     await turnContext.SendActivityAsync($"Bye!", cancellationToken: cancellationToken);
                     System.Environment.Exit(0);
                 }
