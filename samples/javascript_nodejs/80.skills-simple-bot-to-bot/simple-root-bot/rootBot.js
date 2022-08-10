@@ -115,6 +115,10 @@ class RootBot extends ActivityHandler {
         // will have access to current accurate state.
         await this.conversationState.saveChanges(context, true);
 
+        // CLone activity and update its delivery mode.
+        var activity = JSON.parse(JSON.stringify(context.activity));
+        activity.deliveryMode = 'expectReplies';
+
         // Create a conversationId to interact with the skill and send the activity
         const skillConversationId = await this.conversationIdFactory.createSkillConversationIdWithOptions({
             fromBotOAuthScope: context.turnState.get(context.adapter.OAuthScopeKey),
@@ -124,12 +128,45 @@ class RootBot extends ActivityHandler {
         });
 
         // route the activity to the skill
-        const response = await this.skillClient.postActivity(this.botId, targetSkill.appId, targetSkill.skillEndpoint, this.skillsConfig.skillHostEndpoint, skillConversationId, context.activity);
+        const response = await this.skillClient.postActivity(this.botId, targetSkill.appId, targetSkill.skillEndpoint, this.skillsConfig.skillHostEndpoint, skillConversationId, activity);
 
         // Check response status
         if (!(response.status >= 200 && response.status <= 299)) {
             throw new Error(`[RootBot]: Error invoking the skill id: "${ targetSkill.id }" at "${ targetSkill.skillEndpoint }" (status is ${ response.status }). \r\n ${ response.body }`);
         }
+
+        const responseActivities = response.body?.activities;
+
+        for (let index = 0; index < responseActivities.length; index++) {
+            const responseActivity = responseActivities[index];
+            if (responseActivity.type === ActivityTypes.EndOfConversation) {
+                await this.EndConversationAsync(responseActivity, context);
+            } else {
+                await context.sendActivity(responseActivity);
+            }
+        }
+    }
+
+    async EndConversationAsync(activity, context) {
+        // Forgot delivery moe and skill invocation.
+        await this.activeSkillProperty.delete(context);
+
+        // Show status message, text and value returned by the skill
+        var eocActivityMessage = `Received $ {ActivityTypes.EndOfConversation}. \n\nCode: ${ activity.code }.`;
+        if (activity.text === null) {
+            eocActivityMessage += `\n\nText: ${ activity.text }`;
+        }
+
+        if (activity.value != null) {
+            eocActivityMessage += `\n\nValue: ${ JSON.parse(activity.value) }`;
+        }
+
+        await context.sendActivity(eocActivityMessage);
+
+        // We are back at the host.
+        await context.sendActivity('Back in the host bot.');
+
+        await this.conversationState.saveChanges(context, false);
     }
 }
 
