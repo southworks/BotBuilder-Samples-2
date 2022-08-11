@@ -153,7 +153,7 @@ class RootBot extends ActivityHandler {
 
         // Show status message, text and value returned by the skill
         var eocActivityMessage = `Received $ {ActivityTypes.EndOfConversation}. \n\nCode: ${ activity.code }.`;
-        if (activity.text === null) {
+        if (activity.text != null) {
             eocActivityMessage += `\n\nText: ${ activity.text }`;
         }
 
