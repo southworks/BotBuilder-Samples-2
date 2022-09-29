@@ -14,18 +14,16 @@ const restify = require('restify');
 
 // Import required bot services.
 // See https://aka.ms/bot-services to learn more about the different parts of a bot.
-const {
-    CloudAdapter,
-    ConfigurationBotFrameworkAuthentication
-} = require('botbuilder');
+const { BotFrameworkAdapter } = require('botbuilder');
 
 const { TeamsConversationBot } = require('./bots/teamsConversationBot');
 
-const botFrameworkAuthentication = new ConfigurationBotFrameworkAuthentication(process.env);
-
 // Create adapter.
 // See https://aka.ms/about-bot-adapter to learn more about adapters.
-const adapter = new CloudAdapter(botFrameworkAuthentication);
+const adapter = new BotFrameworkAdapter({
+    appId: process.env.MicrosoftAppId,
+    appPassword: process.env.MicrosoftAppPassword
+});
 
 adapter.onTurnError = async (context, error) => {
     // This check writes out errors to console log .vs. app insights.
@@ -52,14 +50,14 @@ const bot = new TeamsConversationBot();
 
 // Create HTTP server.
 const server = restify.createServer();
-server.use(restify.plugins.bodyParser());
 
 server.listen(process.env.port || process.env.PORT || 3978, function() {
     console.log(`\n${ server.name } listening to ${ server.url }`);
 });
 
 // Listen for incoming requests.
-server.post('/api/messages', async (req, res) => {
-    // Route received a request to adapter for processing
-    await adapter.process(req, res, (context) => bot.run(context));
+server.post('/api/messages', (req, res) => {
+    adapter.processActivity(req, res, async (context) => {
+        await bot.run(context);
+    });
 });
