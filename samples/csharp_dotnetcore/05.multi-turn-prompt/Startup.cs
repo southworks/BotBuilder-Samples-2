@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Integration.AspNet.Core;
 using Microsoft.Bot.Connector.Authentication;
+using Microsoft.BotBuilderSamples.Translation;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
@@ -38,6 +39,12 @@ namespace Microsoft.BotBuilderSamples
 
             // The Dialog that will be run by the bot.
             services.AddSingleton<UserProfileDialog>();
+
+            // Create the Microsoft Translator responsible for making calls to the Cognitive Services translation service
+            services.AddSingleton<MicrosoftTranslator>();
+
+            // Create the Translation Middleware that will be added to the middleware pipeline in the AdapterWithErrorHandler
+            services.AddSingleton<TranslationMiddleware>();
 
             // Create the bot as a transient. In this case the ASP Controller is expecting an IBot.
             services.AddTransient<IBot, DialogBot<UserProfileDialog>>();

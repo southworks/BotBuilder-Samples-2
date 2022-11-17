@@ -7,6 +7,7 @@ using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Schema;
 using Microsoft.Extensions.Logging;
+using Microsoft.BotBuilderSamples.Translation;
 
 namespace Microsoft.BotBuilderSamples
 {
@@ -22,12 +23,16 @@ namespace Microsoft.BotBuilderSamples
         protected readonly BotState UserState;
         protected readonly ILogger Logger;
 
+        private readonly IStatePropertyAccessor<string> _languagePreference;
+
         public DialogBot(ConversationState conversationState, UserState userState, T dialog, ILogger<DialogBot<T>> logger)
         {
             ConversationState = conversationState;
             UserState = userState;
             Dialog = dialog;
             Logger = logger;
+
+            _languagePreference = userState.CreateProperty<string>("LanguagePreference");
         }
 
         public override async Task OnTurnAsync(ITurnContext turnContext, CancellationToken cancellationToken = default)
@@ -41,10 +46,15 @@ namespace Microsoft.BotBuilderSamples
 
         protected override async Task OnMessageActivityAsync(ITurnContext<IMessageActivity> turnContext, CancellationToken cancellationToken)
         {
+            await _languagePreference.SetAsync(turnContext, turnContext.Activity.Locale ?? TranslationSettings.DefaultLanguage, cancellationToken);
+
             Logger.LogInformation("Running dialog with Message Activity.");
 
+            // Save the user profile updates into the user state.
+            await UserState.SaveChangesAsync(turnContext, false, cancellationToken);
+
             // Run the Dialog with the new message Activity.
-            await Dialog.RunAsync(turnContext, ConversationState.CreateProperty<DialogState>(nameof(DialogState)), cancellationToken);
+            await Dialog.RunAsync(turnContext, UserState.CreateProperty<DialogState>(nameof(DialogState)), cancellationToken);
         }
     }
 }
