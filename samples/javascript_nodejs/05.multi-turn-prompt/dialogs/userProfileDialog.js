@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-const { MessageFactory } = require('botbuilder');
+// const { MessageFactory } = require('botbuilder');
 const {
     AttachmentPrompt,
     ChoiceFactory,
@@ -15,7 +15,7 @@ const {
     WaterfallDialog
 } = require('botbuilder-dialogs');
 const { Channels } = require('botbuilder-core');
-const { UserProfile } = require('../userProfile');
+// const { UserProfile } = require('../userProfile');
 
 const ATTACHMENT_PROMPT = 'ATTACHMENT_PROMPT';
 const CHOICE_PROMPT = 'CHOICE_PROMPT';
@@ -33,7 +33,7 @@ class UserProfileDialog extends ComponentDialog {
 
         this.addDialog(new TextPrompt(NAME_PROMPT));
         this.addDialog(new ChoicePrompt(CHOICE_PROMPT));
-        this.addDialog(new ConfirmPrompt(CONFIRM_PROMPT));
+        this.addDialog(new ConfirmPrompt(CONFIRM_PROMPT, this.ConfirmPromptValidator));
         this.addDialog(new NumberPrompt(NUMBER_PROMPT, this.agePromptValidator));
         this.addDialog(new AttachmentPrompt(ATTACHMENT_PROMPT, this.picturePromptValidator));
 
@@ -42,8 +42,8 @@ class UserProfileDialog extends ComponentDialog {
             this.nameStep.bind(this),
             this.nameConfirmStep.bind(this),
             this.ageStep.bind(this),
-            this.pictureStep.bind(this),
             this.confirmStep.bind(this),
+            this.pictureStep.bind(this),
             this.summaryStep.bind(this)
         ]));
 
@@ -131,33 +131,33 @@ class UserProfileDialog extends ComponentDialog {
         step.values.picture = step.result && step.result[0];
 
         // WaterfallStep always finishes with the end of the Waterfall or with another dialog; here it is a Prompt Dialog.
-        return await step.prompt(CONFIRM_PROMPT, { prompt: 'Is this okay?' });
+        return await step.prompt(CONFIRM_PROMPT, { prompt: 'Is this okay?', recognizeLanguage: 'en-us' });
     }
 
     async summaryStep(step) {
         if (step.result) {
             // Get the current profile object from user state.
-            const userProfile = await this.userProfile.get(step.context, new UserProfile());
+            // const userProfile = await this.userProfile.get(step.context, new UserProfile());
 
-            userProfile.transport = step.values.transport;
-            userProfile.name = step.values.name;
-            userProfile.age = step.values.age;
-            userProfile.picture = step.values.picture;
+            // userProfile.transport = step.values.transport;
+            // userProfile.name = step.values.name;
+            // userProfile.age = step.values.age;
+            // userProfile.picture = step.values.picture;
 
-            let msg = `I have your mode of transport as ${ userProfile.transport } and your name as ${ userProfile.name }`;
-            if (userProfile.age !== -1) {
-                msg += ` and your age as ${ userProfile.age }`;
-            }
+            const msg = 'Thank you for participating';
+            // if (userProfile.age !== -1) {
+            //     msg += ` and your age as ${ userProfile.age }`;
+            // }
 
-            msg += '.';
+            // msg += '.';
             await step.context.sendActivity(msg);
-            if (userProfile.picture) {
-                try {
-                    await step.context.sendActivity(MessageFactory.attachment(userProfile.picture, 'This is your profile picture.'));
-                } catch {
-                    await step.context.sendActivity('A profile picture was saved but could not be displayed here.');
-                }
-            }
+            // if (userProfile.picture) {
+            //     try {
+            //         await step.context.sendActivity(MessageFactory.attachment(userProfile.picture, 'This is your profile picture.'));
+            //     } catch {
+            //         await step.context.sendActivity('A profile picture was saved but could not be displayed here.');
+            //     }
+            // }
         } else {
             await step.context.sendActivity('Thanks. Your profile will not be kept.');
         }
@@ -169,6 +169,15 @@ class UserProfileDialog extends ComponentDialog {
     async agePromptValidator(promptContext) {
         // This condition is our validation rule. You can also change the value at this point.
         return promptContext.recognized.succeeded && promptContext.recognized.value > 0 && promptContext.recognized.value < 150;
+    }
+
+    async ConfirmPromptValidator(promptContext) {
+        var choices = ['yes', 'no'];
+        if (choices.includes(promptContext.context.activity.text.toLowerCase())) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     async picturePromptValidator(promptContext) {

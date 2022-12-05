@@ -21,6 +21,11 @@ const {
 // Import our custom bot class that provides a turn handling function.
 const { DialogBot } = require('./bots/dialogBot');
 const { UserProfileDialog } = require('./dialogs/userProfileDialog');
+const { MicrosoftTranslator } = require('./translation/microsoftTranslator');
+const { TranslatorMiddleware } = require('./translation/translatorMiddleware');
+
+// Used to create the BotStatePropertyAccessor for storing the user's language preference.
+const LANGUAGE_PREFERENCE = 'language_preference';
 
 const botFrameworkAuthentication = new ConfigurationBotFrameworkAuthentication(process.env);
 
@@ -60,9 +65,14 @@ const memoryStorage = new MemoryStorage();
 const conversationState = new ConversationState(memoryStorage);
 const userState = new UserState(memoryStorage);
 
+const languagePreferenceProperty = userState.createProperty(LANGUAGE_PREFERENCE);
+
+const translator = new MicrosoftTranslator(process.env.translatorKey);
+adapter.use(new TranslatorMiddleware(translator, languagePreferenceProperty));
+
 // Create the main dialog.
 const dialog = new UserProfileDialog(userState);
-const bot = new DialogBot(conversationState, userState, dialog);
+const bot = new DialogBot(conversationState, userState, dialog, languagePreferenceProperty);
 
 // Create HTTP server.
 const server = restify.createServer();
