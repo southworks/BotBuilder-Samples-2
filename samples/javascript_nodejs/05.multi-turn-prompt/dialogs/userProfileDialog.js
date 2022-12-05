@@ -87,8 +87,9 @@ class UserProfileDialog extends ComponentDialog {
         // We can send messages to the user at any point in the WaterfallStep.
         await step.context.sendActivity(`Thanks ${ step.result }.`);
 
+        const promptOptions = { prompt: 'Would you like to give your age?', recognizeLanguage: 'en-us' };
         // WaterfallStep always finishes with the end of the Waterfall or with another dialog; here it is a Prompt Dialog.
-        return await step.prompt(CONFIRM_PROMPT, 'Do you want to give your age?', ['yes', 'no']);
+        return await step.prompt(CONFIRM_PROMPT, promptOptions);
     }
 
     async ageStep(step) {

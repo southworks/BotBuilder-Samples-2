@@ -4,7 +4,7 @@
 const { ActivityTypes } = require('botbuilder');
 const { TranslationSettings } = require('./translationSettings');
 
-const DEFAULT_LANGUAGE = TranslationSettings.englishEnglish;
+const DEFAULT_LANGUAGE = TranslationSettings.defaultLanguage;
 
 class TranslatorMiddleware {
     /**

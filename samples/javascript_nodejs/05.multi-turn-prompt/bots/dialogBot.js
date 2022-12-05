@@ -4,9 +4,9 @@
 const { ActivityHandler } = require('botbuilder');
 const { TranslationSettings } = require('../translation/translationSettings');
 
-const englishEnglish = TranslationSettings.englishEnglish;
-const englishSpanish = TranslationSettings.englishSpanish;
-const spanishEnglish = TranslationSettings.spanishEnglish;
+// const englishEnglish = TranslationSettings.englishEnglish;
+// const englishSpanish = TranslationSettings.englishSpanish;
+// const spanishEnglish = TranslationSettings.spanishEnglish;
 // const spanishSpanish = TranslationSettings.spanishSpanish;
 
 class DialogBot extends ActivityHandler {
@@ -17,27 +17,30 @@ class DialogBot extends ActivityHandler {
      * @param {Dialog} dialog
      * @param {Object} languagePreferenceProperty Accessor for language preference property in the user state.
      */
-    constructor(conversationState, userState, dialog, languagePreferenceProperty) {
+    constructor(conversationState, userState, dialog) {
         super();
         if (!conversationState) throw new Error('[DialogBot]: Missing parameter. conversationState is required');
         if (!userState) throw new Error('[DialogBot]: Missing parameter. userState is required');
         if (!dialog) throw new Error('[DialogBot]: Missing parameter. dialog is required');
-        if (!languagePreferenceProperty) throw new Error('[MultilingualBot]: Missing parameter. languagePreferenceProperty is required');
+        // if (!languagePreferenceProperty) throw new Error('[MultilingualBot]: Missing parameter. languagePreferenceProperty is required');
 
         this.conversationState = conversationState;
         this.userState = userState;
         this.dialog = dialog;
         this.dialogState = this.conversationState.createProperty('DialogState');
-        this.languagePreferenceProperty = languagePreferenceProperty;
+        this.languagePreferenceProperty = this.userState.createProperty('LanguagePreference');
 
         this.onMessage(async (context, next) => {
             console.log('Running dialog with Message Activity.');
 
-            const currentLang = context.activity.text.toLowerCase();
-            const lang = currentLang === englishEnglish || currentLang === spanishEnglish ? englishEnglish : englishSpanish;
+            const currentLang = context.activity.locale.toLowerCase();
+            // const lang = currentLang === englishEnglish || currentLang === spanishEnglish ? englishEnglish : englishSpanish;
+            const lang = currentLang ?? TranslationSettings.defaultLanguage;
 
             // Get the user language preference from the user state.
             await this.languagePreferenceProperty.set(context, lang);
+
+            // await this.userState.saveChanges();
 
             // Run the Dialog with the new message Activity.
             await this.dialog.run(context, this.dialogState);

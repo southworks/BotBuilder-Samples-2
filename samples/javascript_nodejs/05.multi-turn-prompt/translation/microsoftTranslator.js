@@ -18,7 +18,7 @@ class MicrosoftTranslator {
         // https://docs.microsoft.com/en-us/azure/cognitive-services/translator/quickstart-nodejs-translate
         const host = 'https://api.cognitive.microsofttranslator.com';
         const path = '/translate?api-version=3.0';
-        const params = '&from=de&to=';
+        const params = '&to=';
 
         const url = host + path + params + targetLocale;
 

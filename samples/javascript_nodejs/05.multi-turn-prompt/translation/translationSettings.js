@@ -5,7 +5,8 @@ const TranslationSettings = {
     englishEnglish: 'en',
     englishSpanish: 'es',
     spanishEnglish: 'in',
-    spanishSpanish: 'it'
+    spanishSpanish: 'it',
+    defaultLanguage: 'en'
 };
 
 module.exports.TranslationSettings = TranslationSettings;
